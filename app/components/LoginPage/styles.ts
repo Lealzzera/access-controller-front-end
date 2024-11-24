@@ -8,7 +8,7 @@ export const LoginPageContainer = styled.section`
   justify-content: center;
 `;
 
-export const LoginPageForm = styled.div`
+export const LoginPageForm = styled.form`
   height: 80vh;
   width: 80vw;
   border-radius: 0.5rem;

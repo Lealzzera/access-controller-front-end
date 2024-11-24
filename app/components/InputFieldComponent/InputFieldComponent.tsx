@@ -1,7 +1,7 @@
 import { InputField, InputLabel } from "./styles";
 
 type InputFieldComponentProps = {
-  inputType?: "text" | "email" | "password";
+  inputType: "text" | "email" | "password";
   inputValue: string;
   idInput: string;
   inputLabel: string;

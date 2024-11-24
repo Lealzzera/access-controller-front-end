@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import InputFieldComponent from "../InputFieldComponent/InputFieldComponent";
 import {
   ButtonContainer,
@@ -17,14 +17,20 @@ import ButtonComponent from "../ButtonComponent/ButtonComponent";
 export default function LoginPage() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
+
+  const handleLogin = (event: SyntheticEvent) => {
+    event.preventDefault();
+    console.log("test");
+  };
   return (
     <LoginPageContainer>
-      <LoginPageForm>
+      <LoginPageForm onSubmit={handleLogin}>
         <LoginTitle>Login</LoginTitle>
         <WrappedFields>
           <InputFieldComponent
             inputLabel="E-mail:"
             idInput="email"
+            inputType="email"
             inputValue={emailValue}
             setInputValue={setEmailValue}
           />
@@ -32,12 +38,13 @@ export default function LoginPage() {
           <InputFieldComponent
             inputLabel="Senha:"
             idInput="senha"
+            inputType="password"
             inputValue={passwordValue}
             setInputValue={setPasswordValue}
           />
         </WrappedFields>
         <ButtonContainer>
-          <ButtonComponent />
+          <ButtonComponent type="submit" />
         </ButtonContainer>
         <InfoContainer>
           <CreateAccountLink>Criar conta</CreateAccountLink>
