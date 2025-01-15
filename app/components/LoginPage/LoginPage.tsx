@@ -5,6 +5,7 @@ import InputFieldComponent from "../InputFieldComponent/InputFieldComponent";
 import {
   ButtonContainer,
   CreateAccountLink,
+  ErrorMessage,
   ForgotPassowordText,
   InfoContainer,
   LoginPageContainer,
@@ -13,23 +14,39 @@ import {
   WrappedFields,
 } from "./styles";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import { useRouter } from "next/navigation";
+import { loginUser } from "@/app/actions/loginUser";
 
 export default function LoginPage() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const route = useRouter();
 
-  const handleLogin = (event: SyntheticEvent) => {
+  const handleLogin = async () => {
+    if (emailValue.length && passwordValue.length) {
+      const response = await loginUser({
+        email: emailValue,
+        password: passwordValue,
+      });
+
+      console.log(response);
+    }
+  };
+
+  const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
-    console.log("test");
+    await handleLogin();
   };
   return (
     <LoginPageContainer>
-      <LoginPageForm onSubmit={handleLogin}>
+      <LoginPageForm onSubmit={handleSubmit}>
         <LoginTitle>Login</LoginTitle>
         <WrappedFields>
           <InputFieldComponent
             inputLabel="E-mail:"
             idInput="email"
+            showError={errorMessage.length > 0}
             inputType="email"
             inputValue={emailValue}
             setInputValue={setEmailValue}
@@ -38,13 +55,15 @@ export default function LoginPage() {
           <InputFieldComponent
             inputLabel="Senha:"
             idInput="senha"
+            showError={errorMessage.length > 0}
             inputType="password"
             inputValue={passwordValue}
             setInputValue={setPasswordValue}
           />
+          <ErrorMessage>{errorMessage}</ErrorMessage>
         </WrappedFields>
         <ButtonContainer>
-          <ButtonComponent type="submit" />
+          <ButtonComponent disabled={true} type="submit" />
         </ButtonContainer>
         <InfoContainer>
           <CreateAccountLink>Criar conta</CreateAccountLink>

@@ -6,6 +6,7 @@ type InputFieldComponentProps = {
   idInput: string;
   inputLabel: string;
   setInputValue: (value: string) => void;
+  showError?: boolean;
 };
 
 export default function InputFieldComponent({
@@ -14,11 +15,13 @@ export default function InputFieldComponent({
   idInput,
   inputLabel,
   setInputValue,
+  showError,
 }: InputFieldComponentProps) {
   return (
     <div>
       <InputLabel htmlFor={idInput}>{inputLabel}</InputLabel>
       <InputField
+        className={showError ? "error" : ""}
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
         type={inputType}

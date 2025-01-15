@@ -89,3 +89,8 @@ export const ForgotPassowordText = styled.p`
     font-weight: 700;
   }
 `;
+
+export const ErrorMessage = styled.span`
+  font-size: 14px;
+  color: red;
+`;

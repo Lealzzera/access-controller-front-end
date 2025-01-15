@@ -5,6 +5,10 @@ export const InputField = styled.input`
   width: 100%;
   border-radius: 6px;
   border-color: var(--gray-600);
+
+  &.error {
+    border-color: red;
+  }
 `;
 
 export const InputLabel = styled.label`
