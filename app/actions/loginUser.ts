@@ -9,9 +9,7 @@ interface LoginData {
 
 export interface LoginResponse {
   status: number;
-  data: {
-    accessToken: string;
-  };
+  message?: string;
 }
 
 export async function loginUser({
@@ -28,16 +26,28 @@ export async function loginUser({
     });
 
     const data = await response.json();
+
+    if (data.statusCode !== 200) {
+      return {
+        status: data.statusCode,
+        message: data.message || "Erro ao realizar login.",
+      };
+    }
+
     const cookieStore = await cookies();
     cookieStore.set("access_token", data.user.access_token, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 20,
+      maxAge: 60 * 60 * 24 * 20, // 20 dias
     });
 
-    return { data, status: response.status };
-  } catch (error: any) {
-    return error;
+    return { status: 200 };
+  } catch (error: unknown) {
+    console.error("Erro ao realizar login:", error);
+    return {
+      status: 500,
+      message: "Erro interno no servidor. Tente novamente mais tarde.",
+    };
   }
 }

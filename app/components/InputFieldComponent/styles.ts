@@ -14,4 +14,5 @@ export const InputField = styled.input`
 export const InputLabel = styled.label`
   cursor: pointer;
   font-size: 1rem;
+  font-family: var(--main-font-sans);
 `;

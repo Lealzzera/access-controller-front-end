@@ -25,12 +25,16 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     if (emailValue.length && passwordValue.length) {
+      setErrorMessage("");
       const response = await loginUser({
         email: emailValue,
         password: passwordValue,
       });
-
-      console.log(response);
+      if (response.status !== 200) {
+        setErrorMessage("Usuário ou senha inválidos.");
+        return;
+      }
+      route.push("/home");
     }
   };
 
@@ -63,7 +67,10 @@ export default function LoginPage() {
           <ErrorMessage>{errorMessage}</ErrorMessage>
         </WrappedFields>
         <ButtonContainer>
-          <ButtonComponent disabled={true} type="submit" />
+          <ButtonComponent
+            disabled={!emailValue.length || !passwordValue.length}
+            type="submit"
+          />
         </ButtonContainer>
         <InfoContainer>
           <CreateAccountLink>Criar conta</CreateAccountLink>
