@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import StyledComponentsRegistry from "@/lib/registry";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { store } from "@/app/store/store";
+import { Provider } from "react-redux";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Controlador de acessos",
@@ -33,7 +36,9 @@ export default function RootLayout({
       className={`${ibm_plex_sans.variable} ${ibm_plex_mono.variable}`}
     >
       <body>
-        <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
+        <StyledComponentsRegistry>
+          <Providers>{children}</Providers>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );
