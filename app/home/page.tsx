@@ -1,21 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
-import decodeToken from "../helpers/decodeToken";
+import { me } from "../actions/me";
+import { setUserInLocalStorage } from "../helpers/setUserInLocalStorage";
 
 export default function Home() {
-  const saveUserIdInLocalStorage = async () => {
-    const response = await fetch("api/getToken");
-    const { value } = await response.json();
-
-    const { sub } = await decodeToken(value);
-
-    localStorage.setItem("user_id", JSON.stringify(sub));
+  const settingInitialUserConfig = async () => {
+    const response = await me();
+    setUserInLocalStorage(response);
   };
 
   useEffect(() => {
-    saveUserIdInLocalStorage();
+    settingInitialUserConfig();
   }, []);
 
-  return <div>homepage</div>;
+  return <div></div>;
 }
