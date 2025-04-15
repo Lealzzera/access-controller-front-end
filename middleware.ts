@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import verifyToken from "./app/helpers/verifyToken";
 
-export async function middleware(req: NextRequest, res: NextResponse) {
+export async function middleware(req: NextRequest) {
   const { cookies } = req;
 
   const accessToken = cookies.get("access_token")?.value;

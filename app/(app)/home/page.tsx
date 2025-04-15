@@ -1,8 +1,8 @@
 "use client";
 
+import { me } from "@/app/actions/me";
+import { setUserInLocalStorage } from "@/app/helpers/setUserInLocalStorage";
 import { useEffect } from "react";
-import { me } from "../actions/me";
-import { setUserInLocalStorage } from "../helpers/setUserInLocalStorage";
 
 export default function Home() {
   const settingInitialUserConfig = async () => {

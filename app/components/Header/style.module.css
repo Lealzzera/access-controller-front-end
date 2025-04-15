@@ -1,0 +1,27 @@
+.headerContainer {
+  background-color: var(--blue-200);
+  width: 100%;
+  height: 60px;
+  display: flex;
+  padding: 0px 2rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerContainer span {
+  width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.headerContainer p {
+  padding: 0.5rem;
+  font-weight: 700;
+  color: var(--blue-400);
+}
+
+@media (min-width: 1024px) {
+  .headerContainer {
+  }
+}
