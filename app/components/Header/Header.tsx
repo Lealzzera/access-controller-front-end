@@ -17,9 +17,10 @@ export default function Header({ userName }: HeaderProps) {
   };
   return (
     <header className={style.headerContainer}>
-      <div></div>
-      <span>Teste teste teste da silva</span>
-      <p onClick={logoutFunction}>SAIR</p>
+      <div className={style.wrappedContent}>
+        <span>Teste teste teste da silva</span>
+        <p onClick={logoutFunction}>SAIR</p>
+      </div>
     </header>
   );
 }

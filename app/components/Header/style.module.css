@@ -3,25 +3,40 @@
   width: 100%;
   height: 60px;
   display: flex;
-  padding: 0px 2rem;
   justify-content: space-between;
   align-items: center;
 }
 
-.headerContainer span {
+.wrappedContent {
+  width: 300px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wrappedContent span {
   width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.headerContainer p {
+.wrappedContent p {
   padding: 0.5rem;
   font-weight: 700;
   color: var(--blue-400);
+  cursor: pointer;
 }
 
-@media (min-width: 1024px) {
-  .headerContainer {
+@media (min-width: 760px) {
+  .wrappedContent {
+    width: 500px;
+  }
+}
+
+@media (min-width: 900px) {
+  .wrappedContent {
+    width: 850px;
   }
 }
