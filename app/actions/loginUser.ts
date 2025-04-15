@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { apiClient } from "./apiClient";
 
 interface LoginData {
   email: string;
@@ -17,12 +18,17 @@ export async function loginUser({
   password,
 }: LoginData): Promise<LoginResponse> {
   try {
-    const response = await fetch(`${process.env.BACKEND_URL}/auth/sessions`, {
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    const body = JSON.stringify({ email, password });
+
+    const response = await apiClient({
+      path: "/auth/sessions",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+      headers,
+      body,
     });
 
     const data = await response.json();
@@ -34,13 +40,19 @@ export async function loginUser({
       };
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set("access_token", data.user.access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 20, // 20 dias
-    });
+    const cookieFromResponse = response.headers.get("set-cookie")?.split(";");
+    if (cookieFromResponse) {
+      const tokenFromCookie = cookieFromResponse[0].split("=")[1];
+      const maxAge = cookieFromResponse[1].split("=")[1];
+
+      const cookieStore = await cookies();
+      cookieStore.set("access_token", tokenFromCookie, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: Number(maxAge),
+      });
+    }
 
     return { status: 200 };
   } catch (error: unknown) {
