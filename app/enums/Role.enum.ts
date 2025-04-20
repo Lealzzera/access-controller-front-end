@@ -1,0 +1,4 @@
+export enum Role {
+  INSTITUTION = "INSTITUTION",
+  RESPONSIBLE = "RESPONSIBLE",
+}
