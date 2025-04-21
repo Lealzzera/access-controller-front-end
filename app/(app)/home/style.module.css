@@ -8,6 +8,7 @@
   margin: 0 auto;
   margin-top: 1rem;
   padding: 0 2rem;
+  overflow: auto;
 }
 
 .containerCard {
