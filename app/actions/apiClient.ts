@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 type ApiClientType = {
   path: string;
   method: string;
-  headers: HeadersInit | undefined;
+  headers?: HeadersInit | undefined;
   body?: BodyInit | null | undefined;
 };
 
@@ -22,6 +22,7 @@ export async function apiClient({
       Authorization: userTokenFromCookie
         ? `Bearer: ${userTokenFromCookie.value}`
         : "",
+      "Content-Type": "application/json",
     },
     body,
     credentials: "include",

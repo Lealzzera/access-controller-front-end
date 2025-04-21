@@ -1,6 +1,16 @@
 import style from "./style.module.css";
 
-export default function CardInfoComponent() {
+type CardInfoComponentProps = {
+  name: string;
+  period: string;
+  teacher: string;
+};
+
+export default function CardInfoComponent({
+  name,
+  period,
+  teacher,
+}: CardInfoComponentProps) {
   return (
     <div className={style.cardContainer}>
       <div className={style.imageContainer}>
@@ -12,13 +22,16 @@ export default function CardInfoComponent() {
       </div>
       <div className={style.infoContainer}>
         <p>
-          <span className={style.titleInfo}>Nome: </span>Kyle Broflovski
+          <span className={style.titleInfo}>Nome: </span>
+          {name}
         </p>
         <p>
-          <span className={style.titleInfo}>Período: </span>Tarde
+          <span className={style.titleInfo}>Período: </span>
+          {period}
         </p>
         <p>
-          <span className={style.titleInfo}>Prof: </span>Ana Maria Silva Santos
+          <span className={style.titleInfo}>Prof: </span>
+          {teacher}
         </p>
         <p className={style.statusContainer}>
           <span className={style.titleInfo}>Status: </span>
