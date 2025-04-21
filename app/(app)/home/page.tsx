@@ -6,6 +6,7 @@ import { useUser } from "@/app/context/userContext";
 import { useEffect, useState } from "react";
 import { getChildrenByResponsibleId } from "@/app/actions/getChildrenByResponsibleId";
 import { Role } from "@/app/enums/Role.enum";
+import { getChildrenByInstitutionId } from "@/app/actions/getChildrenByInstitutionId";
 
 type ChildrenDataType = {
   id: string;
@@ -25,13 +26,20 @@ export default function Home() {
     }
   };
 
+  const getChildrenInfoByInstitutionId = async () => {
+    if (userInfo) {
+      const response = await getChildrenByInstitutionId(userInfo.id);
+      setChildrenData(response);
+    }
+  };
+
   useEffect(() => {
     if (userInfo?.role === Role.RESPONSIBLE) {
       getChildrenByUserId();
     }
 
     if (userInfo?.role === Role.INSTITUTION) {
-      console.log("É institution");
+      getChildrenInfoByInstitutionId();
     }
   }, [userInfo]);
 
