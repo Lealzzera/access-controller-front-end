@@ -13,6 +13,7 @@ import { Institution } from "../types/institution.type";
 import { getInstitutionById } from "../actions/getInstituitionById";
 import { setUserInLocalStorage } from "../helpers/setUserInLocalStorage";
 import { me } from "../actions/me";
+import { getResponsibleById } from "../actions/getResponsibleById";
 
 type User = {
   id: string;
@@ -43,8 +44,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     const response = await me();
-    let userInfo;
+    let userInfo: any;
     if (response.role === Role.RESPONSIBLE) {
+      userInfo = await getResponsibleById(response.id);
     }
 
     if (response.role === Role.INSTITUTION) {
@@ -54,13 +56,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserInLocalStorage("userData", {
       userId: response.id,
       userRole: response.role,
-      userInfo: userInfo?.institution,
+      userInfo:
+        response.role === Role.INSTITUTION
+          ? userInfo?.institution
+          : userInfo?.responsible,
     });
 
     setUserInfo({
       id: response.id,
       role: response.role,
-      userInfo: userInfo?.institution,
+      userInfo:
+        response.role === Role.INSTITUTION
+          ? userInfo?.institution
+          : userInfo?.responsible,
     });
   };
 

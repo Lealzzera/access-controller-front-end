@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
 export default async function logout() {
-  await cookies().clear();
+  const cookieStore = cookies();
+  (await cookieStore).delete("access_token");
 }
