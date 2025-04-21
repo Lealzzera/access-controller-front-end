@@ -4,9 +4,8 @@ import CardInfoComponent from "@/app/components/CardInfoComponent/CardInfoCompon
 import style from "./style.module.css";
 import { useUser } from "@/app/context/userContext";
 import { useEffect, useState } from "react";
-import { getChildrenByResponsibleId } from "@/app/actions/getChildrenByResponsibleId";
-import { Role } from "@/app/enums/Role.enum";
-import { getChildrenByInstitutionId } from "@/app/actions/getChildrenByInstitutionId";
+import { getChildrenList } from "@/app/actions/getChildrenList";
+import { PERIOD } from "@/app/enums/Period.enum";
 
 type ChildrenDataType = {
   id: string;
@@ -19,28 +18,18 @@ export default function Home() {
   const { userInfo } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
 
-  const getChildrenByUserId = async () => {
+  const getChildrenListByUserId = async () => {
     if (userInfo) {
-      const response = await getChildrenByResponsibleId(userInfo?.id);
-      setChildrenData(response);
-    }
-  };
+      const response = await getChildrenList({
+        userInfo: { id: userInfo.id, role: userInfo.role },
+      });
 
-  const getChildrenInfoByInstitutionId = async () => {
-    if (userInfo) {
-      const response = await getChildrenByInstitutionId(userInfo.id);
       setChildrenData(response);
     }
   };
 
   useEffect(() => {
-    if (userInfo?.role === Role.RESPONSIBLE) {
-      getChildrenByUserId();
-    }
-
-    if (userInfo?.role === Role.INSTITUTION) {
-      getChildrenInfoByInstitutionId();
-    }
+    getChildrenListByUserId();
   }, [userInfo]);
 
   return (
@@ -49,7 +38,7 @@ export default function Home() {
         <div key={item.id} className={style.containerCard}>
           <CardInfoComponent
             name={item.name}
-            period={item.period === "AFTERNOON" ? "Tarde" : "Manhã"}
+            period={item.period === PERIOD.TARDE ? "Tarde" : "Manhã"}
             teacher={item.teacher}
           />
         </div>
