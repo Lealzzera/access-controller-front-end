@@ -10,10 +10,9 @@ import {
 import { Role } from "../enums/Role.enum";
 import { Responsible } from "../types/responsible.type";
 import { Institution } from "../types/institution.type";
-import { getInstitutionById } from "../actions/getInstituitionById";
 import { setUserInLocalStorage } from "../helpers/setUserInLocalStorage";
 import { me } from "../actions/me";
-import { getResponsibleById } from "../actions/getResponsibleById";
+import { getUserInfoById } from "../actions/getUserInfoById";
 
 type User = {
   id: string;
@@ -43,32 +42,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const response = await me();
-    let userInfo: any;
-    if (response.role === Role.RESPONSIBLE) {
-      userInfo = await getResponsibleById(response.id);
-    }
+    const { id, role } = await me();
 
-    if (response.role === Role.INSTITUTION) {
-      userInfo = await getInstitutionById(response.id);
-    }
+    const { userData } = await getUserInfoById({
+      id,
+      role,
+    });
 
     setUserInLocalStorage("userData", {
-      userId: response.id,
-      userRole: response.role,
-      userInfo:
-        response.role === Role.INSTITUTION
-          ? userInfo?.institution
-          : userInfo?.responsible,
+      userId: id,
+      userRole: role,
+      userInfo: userData,
     });
 
     setUserInfo({
-      id: response.id,
-      role: response.role,
-      userInfo:
-        response.role === Role.INSTITUTION
-          ? userInfo?.institution
-          : userInfo?.responsible,
+      id: id,
+      role: role,
+      userInfo: userData,
     });
   };
 
