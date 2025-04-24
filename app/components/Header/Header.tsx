@@ -28,6 +28,10 @@ export default function Header() {
     router.push("/");
   };
 
+  const handleRegisterChildFunction = () => {
+    router.push("/home/register-child")
+  }
+
   useEffect(() => {
     setUserName(userInfo?.userInfo.name);
   }, [userInfo]);
@@ -43,7 +47,7 @@ export default function Header() {
         anchorEl={anchorEl}
 
       >
-        <MenuItem>Cadastrar Criança</MenuItem>
+        <MenuItem onClick={handleRegisterChildFunction}>Cadastrar Criança</MenuItem>
         <MenuItem>Cadastrar Responsável</MenuItem>
         <MenuItem onClick={logoutFunction}>Sair</MenuItem>
       </Menu>
