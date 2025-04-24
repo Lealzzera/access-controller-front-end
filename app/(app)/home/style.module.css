@@ -2,24 +2,23 @@
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   max-width: 300px;
   margin: 0 auto;
-  margin-top: 1rem;
+  align-items: center;
   overflow: auto;
+  height: calc(100vh - 60px);
 }
 
 .containerCard {
   width: 300px;
+  margin-top: 1rem;
 }
 
 @media (min-width: 760px) {
   .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    justify-content: center;
-    align-items: center;
+    align-items: normal;
     max-width: 750px;
   }
 
@@ -32,7 +31,6 @@
   .container {
     display: grid;
     justify-content: center;
-    align-items: center;
   }
 }
 
