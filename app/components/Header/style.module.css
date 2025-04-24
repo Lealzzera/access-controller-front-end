@@ -8,6 +8,16 @@
   overflow: auto;
 }
 
+.containerMenu {
+  cursor: pointer;
+}
+
+.buttonMenu {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .wrappedContent {
   width: 300px;
   margin: 0 auto;
