@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 
 type ModalRegisterComponentProps = {
-    modalText: string
+    modalText?: string
 }
 
 export default function ModalRegisterComponent({modalText}: ModalRegisterComponentProps) {
@@ -15,7 +15,7 @@ export default function ModalRegisterComponent({modalText}: ModalRegisterCompone
   return (
     <div className="modal">
       <div style={{backgroundColor: "red", height: "400px", width: "800px"}} className="modal-content">
-        <h1>{modalText}</h1>
+        <h1>TESTETESTESTES</h1>
         <button onClick={closeModal}>Close</button>
       </div>
     </div>
