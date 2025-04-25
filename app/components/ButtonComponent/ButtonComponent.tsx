@@ -3,16 +3,18 @@ import { ButtonContainer } from "./styles";
 
 interface ButtonComponentProps extends ButtonProps {
   onClick?: (event: any) => void;
+  buttonText: string;
 }
 
 export default function ButtonComponent({
   onClick,
+  buttonText,
   ...props
 }: ButtonComponentProps) {
   return (
     <ButtonContainer>
       <Button {...props} onClick={onClick} fullWidth variant="contained">
-        Login
+        {buttonText}
       </Button>
     </ButtonContainer>
   );
