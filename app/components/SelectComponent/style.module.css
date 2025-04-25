@@ -1,0 +1,22 @@
+.selectLabel {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  font-family: var(--main-font-sans);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.selectComponent {
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  background-color: var(--white);
+  border: 1px solid var(--gray-600);
+  cursor: pointer;
+}
+
+.selectComponent:focus {
+  outline: 2px solid var(--blue-400);
+  border: 1px solid var(--blue-400);
+}
