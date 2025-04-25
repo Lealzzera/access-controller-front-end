@@ -20,6 +20,14 @@
   overflow: auto;
 }
 
+.modalContentWrapped::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modalContentWrapped::-webkit-scrollbar-thumb {
+  width: 5px;
+}
+
 .closeButtonContainer {
   display: flex;
   align-items: center;

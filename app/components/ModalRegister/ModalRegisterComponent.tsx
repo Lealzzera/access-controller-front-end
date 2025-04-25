@@ -25,6 +25,13 @@ const periodOptions = [
   },
 ];
 
+const gradeOptions = [
+  { id: 1, optionLabel: "Maternal 1" },
+  { id: 2, optionLabel: "Maternal 2" },
+  { id: 3, optionLabel: "Maternal 3" },
+  { id: 4, optionLabel: "Maternal 4" },
+];
+
 export default function ModalRegisterComponent() {
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
@@ -42,8 +49,7 @@ export default function ModalRegisterComponent() {
   };
 
   const handleRegister = (event: any) => {
-    event;
-    console.log(event);
+    console.log(period);
   };
 
   const handleStartCamera = async () => {
@@ -200,13 +206,16 @@ export default function ModalRegisterComponent() {
           </div>
           <form className={style.formContainer} action={handleRegister}>
             <InputFieldComponent
+              required={true}
               idInput="name"
               inputLabel="Nome"
+              style={{ textTransform: "capitalize" }}
               setInputValue={setName}
               inputValue={name}
               inputType="text"
             />
             <InputFieldComponent
+              required={true}
               idInput="cpf"
               inputLabel="CPF"
               setInputValue={setCpf}
@@ -215,9 +224,17 @@ export default function ModalRegisterComponent() {
             />
             <SelectComponent
               selectId="period"
+              setSelectValue={setPeriod}
               selectLabel="Período"
               selectOptions={periodOptions}
               selectName="period"
+            />
+            <SelectComponent
+              selectId="grade"
+              setSelectValue={setGrade}
+              selectLabel="Turma"
+              selectOptions={gradeOptions}
+              selectName="grade"
             />
             <div className={style.noPicture}>
               {!imageData ? (
@@ -281,7 +298,8 @@ export default function ModalRegisterComponent() {
                   fontWeight: "bold",
                   color: "#002F1A",
                 }}
-                disabled={true}
+                onClick={handleRegister}
+                disabled={!name || !cpf || !period || !grade || !imageData}
                 buttonText="Enviar"
               />
             </div>

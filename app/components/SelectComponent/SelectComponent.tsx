@@ -10,6 +10,7 @@ type SelectComponentProps = {
   selectOptions: SelectOptionsType[];
   selectId: string;
   selectLabel: string;
+  setSelectValue: (value: any) => void;
 };
 
 export default function SelectComponent({
@@ -17,13 +18,20 @@ export default function SelectComponent({
   selectOptions,
   selectId,
   selectLabel,
+  setSelectValue,
 }: SelectComponentProps) {
   return (
     <div>
       <label className={style.selectLabel} htmlFor={selectId}>
         {selectLabel}
       </label>
-      <select className={style.selectComponent} id={selectId} name={selectName}>
+      <select
+        onChange={(event) => setSelectValue(event.target.value)}
+        className={style.selectComponent}
+        id={selectId}
+        name={selectName}
+      >
+        <option value=""></option>
         {selectOptions.map((option) => (
           <option key={option.id} value={option.id}>
             {option.optionLabel}
