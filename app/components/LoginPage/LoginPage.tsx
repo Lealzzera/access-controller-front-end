@@ -70,6 +70,7 @@ export default function LoginPage() {
           <ButtonComponent
             disabled={!emailValue.length || !passwordValue.length}
             type="submit"
+            buttonText="Login"
           />
         </ButtonContainer>
         <InfoContainer>
