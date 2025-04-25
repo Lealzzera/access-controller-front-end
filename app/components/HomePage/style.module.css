@@ -20,6 +20,7 @@
     grid-template-columns: 1fr 1fr;
     align-items: normal;
     max-width: 750px;
+    grid-auto-rows: min-content;
   }
 
   .containerCard {
