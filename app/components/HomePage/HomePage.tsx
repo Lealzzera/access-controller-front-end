@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import CardInfoComponent from "@/app/components/CardInfoComponent/CardInfoComponent";
 import style from "./style.module.css";
@@ -8,14 +8,14 @@ import { getChildrenList } from "@/app/actions/getChildrenList";
 import { PERIOD } from "@/app/enums/Period.enum";
 
 type ChildrenDataType = {
-    id: string;
-    name: string;
-    period: string;
-    teacher: string;
-  };
+  id: string;
+  name: string;
+  period: string;
+  teacher: string;
+};
 
 export default function HomePage() {
-    const { userInfo } = useUser();
+  const { userInfo } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
 
   const getChildrenListByUserId = async () => {
