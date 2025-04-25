@@ -5,6 +5,7 @@ export const InputField = styled.input`
   width: 100%;
   border-radius: 6px;
   border: 1px solid var(--gray-600);
+  background-color: var(--white);
 
   &.error {
     border-color: red;
@@ -21,4 +22,6 @@ export const InputLabel = styled.label`
   font-size: 0.875rem;
   color: var(--gray-600);
   font-family: var(--main-font-sans);
+  margin-bottom: 0.25rem;
+  display: block;
 `;
