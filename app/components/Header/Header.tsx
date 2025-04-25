@@ -14,20 +14,25 @@ export default function Header() {
   const { userInfo } = useUser();
   const [userName, setUserName] = useState<string | undefined>("");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
   const logoutFunction = async () => {
     await logout();
+    handleCloseMenu();
     window.localStorage.clear();
     router.push("/");
   };
 
   const handleRegisterChildFunction = () => {
+    handleCloseMenu();
     router.push("/home/register");
   };
 
@@ -43,7 +48,12 @@ export default function Header() {
             <button className={style.buttonMenu} onClick={handleClick}>
               <MenuIcon />
             </button>
-            <Menu id="basic-menu" open={open} anchorEl={anchorEl}>
+            <Menu
+              onClose={handleCloseMenu}
+              id="basic-menu"
+              open={open}
+              anchorEl={anchorEl}
+            >
               <MenuItem onClick={handleRegisterChildFunction}>
                 Cadastrar Criança
               </MenuItem>
