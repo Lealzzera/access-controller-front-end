@@ -30,7 +30,7 @@ export default function CardInfoComponent({
           {period}
         </p>
         <p>
-          <span className={style.titleInfo}>Prof: </span>
+          <span className={style.titleInfo}>Turma: </span>
           {teacher}
         </p>
         <p className={style.statusContainer}>
