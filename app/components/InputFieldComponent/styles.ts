@@ -4,15 +4,21 @@ export const InputField = styled.input`
   padding: 10px;
   width: 100%;
   border-radius: 6px;
-  border-color: var(--gray-600);
+  border: 1px solid var(--gray-600);
 
   &.error {
     border-color: red;
+  }
+
+  &:focus {
+    outline: 2px solid var(--blue-400);
+    border: 1px solid var(--blue-400);
   }
 `;
 
 export const InputLabel = styled.label`
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.875rem;
+  color: var(--gray-600);
   font-family: var(--main-font-sans);
 `;
