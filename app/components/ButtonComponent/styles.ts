@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 export const ButtonContainer = styled.div`
+  width: 100%;
   & .MuiButton-root {
     background-color: var(--gray-900);
   }
