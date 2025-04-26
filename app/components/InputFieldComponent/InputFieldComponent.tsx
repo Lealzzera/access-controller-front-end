@@ -8,7 +8,7 @@ interface InputFieldComponentProps extends InputProps {
   inputLabel: string;
   setInputValue: (value: string) => void;
   showError?: boolean;
-  required: boolean;
+  required?: boolean;
 }
 
 export default function InputFieldComponent({

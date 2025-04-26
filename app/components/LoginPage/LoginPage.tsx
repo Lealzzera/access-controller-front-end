@@ -54,9 +54,11 @@ export default function LoginPage() {
             inputType="email"
             inputValue={emailValue}
             setInputValue={setEmailValue}
+            required
           />
 
           <InputFieldComponent
+            required
             inputLabel="Senha:"
             idInput="senha"
             showError={errorMessage.length > 0}
