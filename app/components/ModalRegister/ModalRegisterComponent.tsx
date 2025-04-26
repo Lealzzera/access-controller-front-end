@@ -13,6 +13,7 @@ import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import { useUser } from "@/app/context/userContext";
 import imageCompression from "browser-image-compression";
 import { base64ToBlobConverter } from "@/app/helpers/base64ToBlobConverter";
+import maskCpfFunction from "@/app/helpers/maskCpfFunction";
 
 const periodOptions = [
   {
@@ -358,7 +359,7 @@ export default function ModalRegisterComponent() {
                 required={true}
                 idInput="cpf"
                 inputLabel="CPF"
-                setInputValue={setCpf}
+                setInputValue={(event) => setCpf(maskCpfFunction(event))}
                 inputValue={cpf}
                 inputType="text"
               />
@@ -456,7 +457,11 @@ export default function ModalRegisterComponent() {
                   }}
                   onClick={handleRegister}
                   disabled={
-                    !name || !cpf || !period || !grade || !imagePreviewerData
+                    !name ||
+                    cpf.length < 14 ||
+                    !period ||
+                    !grade ||
+                    !imagePreviewerData
                   }
                   buttonText="Enviar"
                 />
