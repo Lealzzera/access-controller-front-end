@@ -26,6 +26,7 @@ export default function InputFieldComponent({
       <InputLabel className={required ? "required" : ""} htmlFor={idInput}>
         {inputLabel}
       </InputLabel>
+      {/* TODO: CHANGE THIS INPUT TO A NORMAL INPUT REMOVING THE STYLED COMPONENTS */}
       <InputField
         {...props}
         className={showError ? "error" : ""}

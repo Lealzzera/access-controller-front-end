@@ -11,6 +11,7 @@ type SelectComponentProps = {
   selectId: string;
   selectLabel: string;
   setSelectValue: (value: any) => void;
+  required?: boolean;
 };
 
 export default function SelectComponent({
@@ -19,10 +20,14 @@ export default function SelectComponent({
   selectId,
   selectLabel,
   setSelectValue,
+  required,
 }: SelectComponentProps) {
   return (
     <div>
-      <label className={style.selectLabel} htmlFor={selectId}>
+      <label
+        className={`${style.selectLabel} ${required ? style.required : ""}`}
+        htmlFor={selectId}
+      >
         {selectLabel}
       </label>
       <select
