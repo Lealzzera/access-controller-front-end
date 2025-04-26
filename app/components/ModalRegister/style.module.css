@@ -71,7 +71,6 @@
 }
 
 .noPicture {
-  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   border-radius: 6px;
   align-items: center;

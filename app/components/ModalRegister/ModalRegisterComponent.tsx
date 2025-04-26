@@ -47,6 +47,7 @@ export default function ModalRegisterComponent() {
   const [imagePreviewerData, setImagePreviewerData] = useState<
     string | undefined
   >(undefined);
+  const [fileName, setFileName] = useState("");
   const [fileData, setFileData] = useState<File | null>(null);
   const [loadCameraData, setLoadCameraData] = useState(false);
   const [stream, setStream] = useState<MediaStream | undefined>(undefined);
@@ -63,10 +64,13 @@ export default function ModalRegisterComponent() {
     setName("");
     setCpf("");
     setGrade("");
+    setPeriod("");
     setIsCameraModalOpen(false);
-    setImagePreviewerData(undefined),
-      setLoadCameraData(false),
-      setStream(undefined);
+    setImagePreviewerData(undefined);
+    setFileName("");
+    setFileData(null);
+    setLoadCameraData(false);
+    setStream(undefined);
   };
 
   const handleCloseModal = () => {
@@ -163,6 +167,7 @@ export default function ModalRegisterComponent() {
       const finalFile = await compressFile(file);
       const url = URL.createObjectURL(finalFile);
       setImagePreviewerData(url);
+      setFileName("");
     }
   };
 
@@ -200,6 +205,7 @@ export default function ModalRegisterComponent() {
     if (file) {
       await compressFile(file);
       const url = URL.createObjectURL(file);
+      setFileName(file.name);
       setImagePreviewerData(url);
     }
   };
@@ -372,7 +378,14 @@ export default function ModalRegisterComponent() {
                 selectOptions={gradeOptions}
                 selectName="grade"
               />
-              <div className={style.noPicture}>
+              <div
+                style={{
+                  backgroundColor: imagePreviewerData
+                    ? "transparent"
+                    : "rgba(0, 0, 0, 0.4)",
+                }}
+                className={style.noPicture}
+              >
                 {!imagePreviewerData ? (
                   <div
                     style={{
@@ -395,7 +408,14 @@ export default function ModalRegisterComponent() {
                   />
                 )}
               </div>
-              <p style={{ visibility: "initial" }}>{}</p>
+              <p
+                style={{
+                  fontSize: "10px",
+                  visibility: fileName.length ? "initial" : "hidden",
+                }}
+              >
+                {fileName.length ? fileName : "nothing"}
+              </p>
               <div className={style.containerButtons}>
                 <div className={style.containerFileButton}>
                   <label className={style.chooseFileLabel} htmlFor="inputFile">
