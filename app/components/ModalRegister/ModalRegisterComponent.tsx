@@ -9,6 +9,8 @@ import SelectComponent from "../SelectComponent/SelectComponent";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 import NoPhotographyRoundedIcon from "@mui/icons-material/NoPhotographyRounded";
 import Image from "next/image";
+import { Skeleton } from "@mui/material";
+import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 
 const periodOptions = [
   {
@@ -40,12 +42,23 @@ export default function ModalRegisterComponent() {
 
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const [imageData, setImageData] = useState<string | undefined>(undefined);
+  const [loadCameraData, setLoadCameraData] = useState(false);
+  const [stream, setStream] = useState<MediaStream | undefined>(undefined);
 
   const modalContainer = useRef(null);
   const router = useRouter();
 
-  const handleCloseModal = (event: any) => {
-    if (event.target === modalContainer.current) router.back();
+  const handleCloseModalClickingOutside = (event: any) => {
+    if (event.target === modalContainer.current) {
+      handleCloseModal();
+    }
+  };
+
+  const handleCloseModal = () => {
+    router.back();
+    stream?.getTracks().forEach((track) => {
+      track.stop();
+    });
   };
 
   const handleRegister = (event: any) => {
@@ -54,15 +67,23 @@ export default function ModalRegisterComponent() {
 
   const handleStartCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setLoadCameraData(true);
+      const streamNavigator = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      setStream(streamNavigator);
+      if (streamNavigator.active) {
+        setLoadCameraData(false);
+      }
       const videoElement = document.getElementById(
         "camera"
       ) as HTMLVideoElement;
       if (videoElement) {
-        videoElement.srcObject = stream;
+        videoElement.srcObject = streamNavigator;
         videoElement.play();
       }
     } catch (err) {
+      setLoadCameraData(false);
       console.error("Error accessing user's camera: ", err);
     }
   };
@@ -75,6 +96,7 @@ export default function ModalRegisterComponent() {
   };
 
   const takePicture = () => {
+    if (!stream?.active) return;
     if (imageData?.length) return;
     const video = document.getElementById("camera") as HTMLVideoElement;
     const canvas = document.getElementById("snapshot") as HTMLCanvasElement;
@@ -102,12 +124,18 @@ export default function ModalRegisterComponent() {
   const savePicture = () => {
     if (imageData) {
       setIsCameraModalOpen(false);
+      stream?.getTracks().forEach((track) => {
+        track.stop();
+      });
     }
   };
 
   const cancelTakePicture = () => {
     setIsCameraModalOpen(false);
     setImageData(undefined);
+    stream?.getTracks().forEach((track) => {
+      track.stop();
+    });
   };
 
   const handleTakeAnotherPicture = () => {
@@ -122,6 +150,10 @@ export default function ModalRegisterComponent() {
     takePicture();
   };
 
+  const handleChangeImage = (event: any) => {
+    console.log(event.target.files[0]);
+  };
+
   useEffect(() => {
     if (isCameraModalOpen) {
       handleStartCamera();
@@ -131,27 +163,73 @@ export default function ModalRegisterComponent() {
   return (
     <>
       <div
-        onClick={handleCloseModal}
+        onClick={handleCloseModalClickingOutside}
         ref={modalContainer}
         className={`${style.modalContainer}`}
       >
         {isCameraModalOpen && (
           <div className={style.modalCamera}>
-            <video
-              style={{ display: !imageData ? "block" : "none" }}
-              className={style.videoCamera}
-              id="camera"
-              autoPlay
-            ></video>
-            <>
-              <canvas
-                id="snapshot"
-                width="640"
-                height="480"
-                style={{ display: "none" }}
-              ></canvas>
-              <div id="photo" className={style.photoContainer}></div>
-            </>
+            <div
+              style={{
+                display: !loadCameraData && stream?.active ? "block" : "none",
+              }}
+            >
+              <video
+                style={{ display: !imageData ? "block" : "none" }}
+                className={style.videoCamera}
+                id="camera"
+                autoPlay
+              ></video>
+              <>
+                <canvas
+                  id="snapshot"
+                  width="640"
+                  height="480"
+                  style={{ display: "none" }}
+                ></canvas>
+                <div id="photo" className={style.photoContainer}></div>
+              </>
+            </div>
+
+            {!loadCameraData && !stream?.active && (
+              <div
+                className={style.videoCamera}
+                style={{
+                  height: "100%",
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <ErrorOutlinedIcon
+                  style={{ fontSize: "80px", color: "rgba(0, 0, 0, 0.6)" }}
+                />
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "rgba(0, 0, 0, 0.6)",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Libere o acesso a câmera nas configurações do navegador.
+                </p>
+              </div>
+            )}
+
+            {loadCameraData && (
+              <Skeleton
+                animation="pulse"
+                className={style.videoCamera}
+                style={{
+                  height: "100%",
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                }}
+                variant="rectangular"
+              />
+            )}
+
             <div className={style.containerButtonPhoto}>
               <div>
                 <ButtonComponent
@@ -181,6 +259,7 @@ export default function ModalRegisterComponent() {
                   }}
                   onClick={!imageData ? takePicture : savePicture}
                   buttonText={imageData ? "Salvar foto" : "Tirar foto"}
+                  disabled={!stream?.active}
                 />
               </div>
             </div>
@@ -192,7 +271,7 @@ export default function ModalRegisterComponent() {
         >
           <div className={style.closeButtonContainer}>
             <CloseRoundedIcon
-              onClick={() => router.back()}
+              onClick={handleCloseModal}
               fontSize="large"
               className={style.closeIcon}
             />
@@ -261,7 +340,7 @@ export default function ModalRegisterComponent() {
             </div>
             <div className={style.containerButtons}>
               <div>
-                <ButtonComponent
+                {/* <ButtonComponent
                   style={{
                     fontSize: "12px",
                     textTransform: "none",
@@ -272,6 +351,11 @@ export default function ModalRegisterComponent() {
                     boxShadow: "none",
                   }}
                   buttonText="Selecionar"
+                /> */}
+                <input
+                  onChange={handleChangeImage}
+                  type="file"
+                  accept="image/*"
                 />
               </div>
               <div>
