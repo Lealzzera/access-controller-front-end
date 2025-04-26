@@ -74,10 +74,10 @@ export default function LoginPage() {
           />
         </ButtonContainer>
         <InfoContainer>
-          <CreateAccountLink>Criar conta</CreateAccountLink>
+          {/* <CreateAccountLink>Criar conta</CreateAccountLink>
           <ForgotPassowordText>
             Esqueceu a sua senha? <span>Clique aqui!</span>
-          </ForgotPassowordText>
+          </ForgotPassowordText> */}
         </InfoContainer>
       </LoginPageForm>
     </LoginPageContainer>
