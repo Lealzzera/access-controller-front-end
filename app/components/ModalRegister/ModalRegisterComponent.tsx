@@ -15,6 +15,7 @@ import imageCompression from "browser-image-compression";
 import { base64ToBlobConverter } from "@/app/helpers/base64ToBlobConverter";
 import maskCpfFunction from "@/app/helpers/maskCpfFunction";
 import maskBirthDateFunction from "@/app/helpers/maskBirthDateFunction";
+import parseDateWithDateFns from "@/app/helpers/parseDateWithDateFns";
 
 const periodOptions = [
   {
@@ -87,13 +88,14 @@ export default function ModalRegisterComponent() {
 
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const parsedDate = parseDateWithDateFns(birthDate);
     console.log({
       name,
       cpf,
       period,
       grade,
       fileData,
-      birthDate,
+      birthDate: parsedDate?.toISOString(),
     });
   };
   const handleStartCamera = async () => {
