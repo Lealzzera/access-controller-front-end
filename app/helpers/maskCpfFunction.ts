@@ -1,11 +1,8 @@
 export default function maskCpfFunction(value: string) {
-  // Remove tudo que não é número
   value = value.replace(/\D/g, "");
 
-  // Limita para 11 dígitos
   value = value.substring(0, 11);
 
-  // Aplica a máscara
   if (value.length > 9) {
     return value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   } else if (value.length > 6) {

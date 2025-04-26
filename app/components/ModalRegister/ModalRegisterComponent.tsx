@@ -14,6 +14,7 @@ import { useUser } from "@/app/context/userContext";
 import imageCompression from "browser-image-compression";
 import { base64ToBlobConverter } from "@/app/helpers/base64ToBlobConverter";
 import maskCpfFunction from "@/app/helpers/maskCpfFunction";
+import maskBirthDateFunction from "@/app/helpers/maskBirthDateFunction";
 
 const periodOptions = [
   {
@@ -42,6 +43,7 @@ export default function ModalRegisterComponent() {
 
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [period, setPeriod] = useState("");
   const [grade, setGrade] = useState("");
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -72,6 +74,7 @@ export default function ModalRegisterComponent() {
     setFileData(null);
     setLoadCameraData(false);
     setStream(undefined);
+    setBirthDate("");
   };
 
   const handleCloseModal = () => {
@@ -82,8 +85,17 @@ export default function ModalRegisterComponent() {
     resetAllStatus();
   };
 
-  const handleRegister = (event: any) => {};
-
+  const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log({
+      name,
+      cpf,
+      period,
+      grade,
+      fileData,
+      birthDate,
+    });
+  };
   const handleStartCamera = async () => {
     try {
       setLoadCameraData(true);
@@ -345,7 +357,7 @@ export default function ModalRegisterComponent() {
                 dados abaixo.
               </p>
             </div>
-            <form className={style.formContainer} action={handleRegister}>
+            <form className={style.formContainer} onSubmit={handleRegister}>
               <InputFieldComponent
                 required={true}
                 idInput="name"
@@ -364,6 +376,18 @@ export default function ModalRegisterComponent() {
                 inputValue={cpf}
                 inputType="text"
                 placeholder="999.999.999-99"
+              />
+              <InputFieldComponent
+                required={true}
+                idInput="birthDate"
+                inputLabel="Data de nascimento"
+                style={{ textTransform: "capitalize" }}
+                setInputValue={(event) =>
+                  setBirthDate(maskBirthDateFunction(event))
+                }
+                inputValue={birthDate}
+                inputType="text"
+                placeholder="DD/MM/YYYY"
               />
               <SelectComponent
                 required
@@ -459,7 +483,7 @@ export default function ModalRegisterComponent() {
                     fontWeight: "bold",
                     color: "#002F1A",
                   }}
-                  onClick={handleRegister}
+                  type="submit"
                   disabled={
                     !name ||
                     cpf.length < 14 ||
