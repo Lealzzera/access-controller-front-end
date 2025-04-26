@@ -12,6 +12,7 @@ type SelectComponentProps = {
   selectLabel: string;
   setSelectValue: (value: any) => void;
   required?: boolean;
+  labelText: string;
 };
 
 export default function SelectComponent({
@@ -21,6 +22,7 @@ export default function SelectComponent({
   selectLabel,
   setSelectValue,
   required,
+  labelText,
 }: SelectComponentProps) {
   return (
     <div>
@@ -36,7 +38,9 @@ export default function SelectComponent({
         id={selectId}
         name={selectName}
       >
-        <option value=""></option>
+        <option value="" disabled selected hidden>
+          {labelText}
+        </option>
         {selectOptions.map((option) => (
           <option key={option.id} value={option.id}>
             {option.optionLabel}

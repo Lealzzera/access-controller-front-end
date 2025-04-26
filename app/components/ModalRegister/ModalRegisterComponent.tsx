@@ -354,14 +354,16 @@ export default function ModalRegisterComponent() {
                 setInputValue={setName}
                 inputValue={name}
                 inputType="text"
+                placeholder="Ex: João da Silva Santos"
               />
               <InputFieldComponent
                 required={true}
                 idInput="cpf"
-                inputLabel="CPF"
+                inputLabel="CPF (somente números)"
                 setInputValue={(event) => setCpf(maskCpfFunction(event))}
                 inputValue={cpf}
                 inputType="text"
+                placeholder="999.999.999-99"
               />
               <SelectComponent
                 required
@@ -370,6 +372,7 @@ export default function ModalRegisterComponent() {
                 selectLabel="Período"
                 selectOptions={periodOptions}
                 selectName="period"
+                labelText="Selecione um período"
               />
               <SelectComponent
                 required
@@ -378,6 +381,7 @@ export default function ModalRegisterComponent() {
                 selectLabel="Turma"
                 selectOptions={gradeOptions}
                 selectName="grade"
+                labelText="Selecione uma turma"
               />
               <div
                 style={{
