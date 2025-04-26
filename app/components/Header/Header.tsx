@@ -11,7 +11,7 @@ import React from "react";
 
 export default function Header() {
   const router = useRouter();
-  const { userInfo } = useUser();
+  const { userInfo, setRegisterModalOpen } = useUser();
   const [userName, setUserName] = useState<string | undefined>("");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -33,7 +33,7 @@ export default function Header() {
 
   const handleRegisterChildFunction = () => {
     handleCloseMenu();
-    router.push("/home/register");
+    setRegisterModalOpen(true);
   };
 
   useEffect(() => {

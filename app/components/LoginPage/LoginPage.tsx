@@ -54,9 +54,11 @@ export default function LoginPage() {
             inputType="email"
             inputValue={emailValue}
             setInputValue={setEmailValue}
+            required
           />
 
           <InputFieldComponent
+            required
             inputLabel="Senha:"
             idInput="senha"
             showError={errorMessage.length > 0}
@@ -70,13 +72,14 @@ export default function LoginPage() {
           <ButtonComponent
             disabled={!emailValue.length || !passwordValue.length}
             type="submit"
+            buttonText="Login"
           />
         </ButtonContainer>
         <InfoContainer>
-          <CreateAccountLink>Criar conta</CreateAccountLink>
+          {/* <CreateAccountLink>Criar conta</CreateAccountLink>
           <ForgotPassowordText>
             Esqueceu a sua senha? <span>Clique aqui!</span>
-          </ForgotPassowordText>
+          </ForgotPassowordText> */}
         </InfoContainer>
       </LoginPageForm>
     </LoginPageContainer>

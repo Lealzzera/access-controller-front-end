@@ -9,6 +9,7 @@
   justify-content: center;
   display: flex;
   z-index: 99999;
+  overflow: auto;
 }
 
 .modalContentWrapped {
@@ -17,6 +18,14 @@
   height: 80vh;
   border-radius: 8px;
   overflow: auto;
+}
+
+.modalContentWrapped::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modalContentWrapped::-webkit-scrollbar-thumb {
+  width: 5px;
 }
 
 .closeButtonContainer {
@@ -52,7 +61,7 @@
 }
 
 .formContainer {
-  height: calc(100% - 162px);
+  min-height: calc(100% - 162px);
   padding: 0 20px;
   margin-top: 2rem;
   overflow: auto;
@@ -61,9 +70,97 @@
   gap: 1rem;
 }
 
+.noPicture {
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.imageSelected {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.containerButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.containerFileButton {
+  display: "flex";
+  align-items: "center";
+  justify-content: "center";
+  flex-direction: column;
+}
+
+.chooseFileLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--blue-400);
+  font-size: 14px;
+  border: 2px solid var(--blue-400);
+  cursor: pointer;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.chooseFileButton {
+  width: 0px;
+  display: none;
+}
+
+.containerButtons div {
+  width: 100px;
+}
+
+.registerButtonContainer {
+  margin-bottom: 0.75rem;
+}
+
+.modalCamera {
+  position: absolute;
+  width: 300px;
+  background-color: var(--gray-100);
+  z-index: 2;
+  height: 300px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.videoCamera {
+  width: 280px;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.containerButtonPhoto {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.containerButtonPhoto div {
+  width: 100px;
+}
+
 @media (min-width: 760px) {
-  .modalContentWrapped {
+  .modalContentWrapped,
+  .modalCamera {
     width: 500px;
+  }
+
+  .modalCamera {
+    height: 450px;
   }
 
   .registerInformationText {
@@ -72,5 +169,21 @@
 
   .formContainer {
     padding: 0 50px;
+  }
+
+  .videoCamera {
+    width: 480px;
+  }
+
+  .imageSelected {
+    height: auto;
+  }
+
+  .containerButtons div {
+    width: 180px;
+  }
+
+  .containerButtonPhoto div {
+    width: 200px;
   }
 }

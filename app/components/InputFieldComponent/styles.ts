@@ -24,4 +24,9 @@ export const InputLabel = styled.label`
   font-family: var(--main-font-sans);
   margin-bottom: 0.25rem;
   display: block;
+
+  &.required::after {
+    content: "*";
+    color: var(--red-600);
+  }
 `;
