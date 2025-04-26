@@ -38,7 +38,7 @@ export default function SelectComponent({
         id={selectId}
         name={selectName}
       >
-        <option value="" disabled selected hidden>
+        <option value="" defaultValue={labelText ?? ""} hidden>
           {labelText}
         </option>
         {selectOptions.map((option) => (
