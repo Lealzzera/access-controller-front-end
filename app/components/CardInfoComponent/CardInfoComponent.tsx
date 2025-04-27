@@ -1,22 +1,27 @@
+import Image from "next/image";
 import style from "./style.module.css";
 
 type CardInfoComponentProps = {
   name: string;
   period: string;
-  teacher: string;
+  grade: string;
+  pictureUrl: string;
 };
 
 export default function CardInfoComponent({
   name,
   period,
-  teacher,
+  grade,
+  pictureUrl,
 }: CardInfoComponentProps) {
   return (
     <div className={style.cardContainer}>
       <div className={style.imageContainer}>
-        <img
-          src="https://images.paramount.tech/uri/mgid:arc:imageassetref:shared.southpark.br:3f26146f-dd21-415a-ab52-34fe4dff3175?quality=0.7&gen=ntrn"
-          alt="Teste"
+        <Image
+          src={pictureUrl}
+          width={50}
+          height={50}
+          alt={name}
           className={style.imgContent}
         />
       </div>
@@ -31,7 +36,7 @@ export default function CardInfoComponent({
         </p>
         <p>
           <span className={style.titleInfo}>Turma: </span>
-          {teacher}
+          {grade}
         </p>
         <p className={style.statusContainer}>
           <span className={style.titleInfo}>Status: </span>
