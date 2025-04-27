@@ -2,16 +2,17 @@
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  max-width: 300px;
+  max-width: 320px;
   margin: 0 auto;
   align-items: center;
   overflow: auto;
   height: calc(100vh - 60px);
+  padding-bottom: 1rem;
+  padding-top: 1rem;
 }
 
 .containerCard {
   width: 300px;
-  margin-top: 1rem;
 }
 
 @media (min-width: 760px) {
