@@ -16,35 +16,17 @@ import { base64ToBlobConverter } from "@/app/helpers/base64ToBlobConverter";
 import maskCpfFunction from "@/app/helpers/maskCpfFunction";
 import maskBirthDateFunction from "@/app/helpers/maskBirthDateFunction";
 import parseDateWithDateFns from "@/app/helpers/parseDateWithDateFns";
-
-const periodOptions = [
-  {
-    id: 1,
-    optionLabel: "Manhã",
-  },
-  {
-    id: 2,
-    optionLabel: "Tarde",
-  },
-  {
-    id: 3,
-    optionLabel: "Noite",
-  },
-];
-
-const gradeOptions = [
-  { id: 1, optionLabel: "Maternal 1" },
-  { id: 2, optionLabel: "Maternal 2" },
-  { id: 3, optionLabel: "Maternal 3" },
-  { id: 4, optionLabel: "Maternal 4" },
-];
+import { getGradesByInstituionId } from "@/app/actions/getGradesByInstitutionId";
+import { getPeriodsByInstituionId } from "@/app/actions/getPeriodsByInstitutionId";
 
 export default function ModalRegisterComponent() {
-  const { registerModalOpen, setRegisterModalOpen } = useUser();
+  const { registerModalOpen, setRegisterModalOpen, userInfo } = useUser();
 
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [gradeOptions, setGradeOptions] = useState([]);
+  const [periodOptions, setPeriodOptions] = useState([]);
   const [period, setPeriod] = useState("");
   const [grade, setGrade] = useState("");
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -224,6 +206,20 @@ export default function ModalRegisterComponent() {
       setImagePreviewerData(url);
     }
   };
+
+  useEffect(() => {
+    if (!userInfo?.id) return;
+    const fetchData = async () => {
+      const [gradeResponse, periodResponse] = await Promise.all([
+        getGradesByInstituionId(userInfo?.id),
+        getPeriodsByInstituionId(userInfo.id),
+      ]);
+      setGradeOptions(gradeResponse);
+      setPeriodOptions(periodResponse);
+    };
+
+    fetchData();
+  }, [userInfo]);
 
   useEffect(() => {
     if (isCameraModalOpen) {

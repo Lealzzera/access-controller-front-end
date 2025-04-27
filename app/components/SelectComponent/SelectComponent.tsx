@@ -2,7 +2,7 @@ import style from "./style.module.css";
 
 type SelectOptionsType = {
   id?: string | number;
-  optionLabel: string;
+  name: string;
 };
 
 type SelectComponentProps = {
@@ -43,7 +43,7 @@ export default function SelectComponent({
         </option>
         {selectOptions.map((option) => (
           <option key={option.id} value={option.id}>
-            {option.optionLabel}
+            {option.name}
           </option>
         ))}
       </select>
