@@ -1,0 +1,43 @@
+.modalCamera {
+  width: 300px;
+  border-radius: 6px;
+  height: 300px;
+  display: flex;
+  object-fit: cover;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--gray-100);
+}
+
+.videoCamera {
+  width: 280px;
+  margin: 1rem;
+  border-radius: 6px;
+}
+
+.containerButtonPhoto {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.containerButtonPhoto div {
+  width: 100px;
+}
+
+@media (min-width: 760px) {
+  .modalCamera {
+    width: 500px;
+    height: 450px;
+  }
+
+  .videoCamera {
+    width: 480px;
+  }
+
+  .containerButtonPhoto div {
+    width: 200px;
+  }
+}

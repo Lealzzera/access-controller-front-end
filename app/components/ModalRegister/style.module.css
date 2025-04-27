@@ -123,43 +123,9 @@
   margin-bottom: 0.75rem;
 }
 
-.modalCamera {
-  position: absolute;
-  width: 300px;
-  background-color: var(--gray-100);
-  z-index: 2;
-  height: 300px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.videoCamera {
-  width: 280px;
-  border-radius: 8px;
-  margin-top: 0.5rem;
-}
-
-.containerButtonPhoto {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  padding: 12px;
-}
-
-.containerButtonPhoto div {
-  width: 100px;
-}
-
 @media (min-width: 760px) {
-  .modalContentWrapped,
-  .modalCamera {
+  .modalContentWrapped {
     width: 500px;
-  }
-
-  .modalCamera {
-    height: 450px;
   }
 
   .registerInformationText {
@@ -170,19 +136,11 @@
     padding: 0 50px;
   }
 
-  .videoCamera {
-    width: 480px;
-  }
-
   .imageSelected {
     height: auto;
   }
 
   .containerButtons div {
     width: 180px;
-  }
-
-  .containerButtonPhoto div {
-    width: 200px;
   }
 }

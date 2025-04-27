@@ -8,16 +8,14 @@ import SelectComponent from "../SelectComponent/SelectComponent";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 import NoPhotographyRoundedIcon from "@mui/icons-material/NoPhotographyRounded";
 import Image from "next/image";
-import { Skeleton } from "@mui/material";
-import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import { useUser } from "@/app/context/userContext";
-import imageCompression from "browser-image-compression";
-import { base64ToBlobConverter } from "@/app/helpers/base64ToBlobConverter";
 import maskCpfFunction from "@/app/helpers/maskCpfFunction";
 import maskBirthDateFunction from "@/app/helpers/maskBirthDateFunction";
 import parseDateWithDateFns from "@/app/helpers/parseDateWithDateFns";
 import { getGradesByInstituionId } from "@/app/actions/getGradesByInstitutionId";
 import { getPeriodsByInstituionId } from "@/app/actions/getPeriodsByInstitutionId";
+import ModalCameraComponent from "../ModalCameraComponent/ModalCameraComponent";
+import compressFile from "@/app/helpers/compressFile";
 
 export default function ModalRegisterComponent() {
   const { registerModalOpen, setRegisterModalOpen, userInfo } = useUser();
@@ -110,97 +108,11 @@ export default function ModalRegisterComponent() {
     setIsCameraModalOpen(true);
   };
 
-  const compressFile = async (file: File): Promise<File> => {
-    const maxFileSizeMB = 1;
-    const currentFileSizeMB = file.size / 1024 / 1024;
-
-    if (currentFileSizeMB <= maxFileSizeMB) {
-      setFileData(file);
-      return file;
-    }
-
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 800,
-      useWebWorker: true,
-    };
-
-    try {
-      const compressedFile = await imageCompression(file, options);
-      setFileData(compressedFile);
-      return compressedFile;
-    } catch (err) {
-      console.error("Error to compress image: ", err);
-      setFileData(file);
-      return file;
-    }
-  };
-
-  const takePicture = async () => {
-    if (!stream?.active) return;
-    if (imagePreviewerData?.length) return;
-    const video = document.getElementById("camera") as HTMLVideoElement;
-    const canvas = document.getElementById("snapshot") as HTMLCanvasElement;
-    const photoContainer = document.getElementById("photo");
-
-    const context = canvas.getContext("2d");
-    if (context && photoContainer) {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const imageDataURL = canvas.toDataURL("image/png");
-      const imageContent = document.createElement("img");
-      const screenSize = window.innerWidth;
-
-      imageContent.style.width = screenSize >= 760 ? "480px" : "280px";
-      imageContent.style.borderRadius = "8px";
-      imageContent.style.marginTop = "8px";
-      imageContent.src = imageDataURL;
-
-      photoContainer.appendChild(imageContent);
-
-      const blobFile = base64ToBlobConverter(imageDataURL);
-      const file = new File([blobFile], "foto.jpg", { type: blobFile.type });
-
-      const finalFile = await compressFile(file);
-      const url = URL.createObjectURL(finalFile);
-      setImagePreviewerData(url);
-      setFileName("");
-    }
-  };
-
-  const savePicture = () => {
-    if (imagePreviewerData) {
-      setIsCameraModalOpen(false);
-      stream?.getTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-  };
-
-  const cancelTakePicture = () => {
-    setIsCameraModalOpen(false);
-    setImagePreviewerData(undefined);
-    stream?.getTracks().forEach((track) => {
-      track.stop();
-    });
-  };
-
-  const handleTakeAnotherPicture = () => {
-    setImagePreviewerData(undefined);
-    const photoContainer = document.getElementById("photo");
-    const photoContent = photoContainer?.getElementsByTagName("img");
-
-    if (photoContent) {
-      const photoContentList = Array.from(photoContent)[0];
-      photoContainer?.removeChild(photoContentList);
-    }
-    takePicture();
-  };
-
   const handleChangeImage = async (event: any) => {
     const file = event.target.files[0];
     if (file) {
-      await compressFile(file);
+      const fileCompressed = await compressFile(file);
+      setFileData(fileCompressed);
       const url = URL.createObjectURL(file);
       setFileName(file.name);
       setImagePreviewerData(url);
@@ -235,108 +147,17 @@ export default function ModalRegisterComponent() {
           ref={modalContainer}
           className={`${style.modalContainer}`}
         >
-          {isCameraModalOpen && (
-            <div className={style.modalCamera}>
-              <div
-                style={{
-                  display: !loadCameraData && stream?.active ? "block" : "none",
-                }}
-              >
-                <video
-                  style={{ display: !imagePreviewerData ? "block" : "none" }}
-                  className={style.videoCamera}
-                  id="camera"
-                  autoPlay
-                ></video>
-                <>
-                  <canvas
-                    id="snapshot"
-                    width="640"
-                    height="480"
-                    style={{ display: "none" }}
-                  ></canvas>
-                  <div id="photo" className={style.photoContainer}></div>
-                </>
-              </div>
-
-              {!loadCameraData && !stream?.active && (
-                <div
-                  className={style.videoCamera}
-                  style={{
-                    height: "100%",
-                    backgroundColor: "rgba(0, 0, 0, 0.4)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                  }}
-                >
-                  <ErrorOutlinedIcon
-                    style={{ fontSize: "80px", color: "rgba(0, 0, 0, 0.6)" }}
-                  />
-                  <p
-                    style={{
-                      textAlign: "center",
-                      color: "rgba(0, 0, 0, 0.6)",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Libere o acesso a câmera nas configurações do navegador.
-                  </p>
-                </div>
-              )}
-
-              {loadCameraData && (
-                <Skeleton
-                  animation="pulse"
-                  className={style.videoCamera}
-                  style={{
-                    height: "100%",
-                    backgroundColor: "rgba(0, 0, 0, 0.4)",
-                  }}
-                  variant="rectangular"
-                />
-              )}
-
-              <div className={style.containerButtonPhoto}>
-                <div>
-                  <ButtonComponent
-                    style={{
-                      fontSize: "12px",
-                      textTransform: "none",
-                      backgroundColor: "transparent",
-                      color: "var(--red-600)",
-                      border: "1px solid var(--red-600)",
-                      fontWeight: "bold",
-                      boxShadow: "none",
-                    }}
-                    onClick={
-                      imagePreviewerData
-                        ? handleTakeAnotherPicture
-                        : cancelTakePicture
-                    }
-                    buttonText={"Cancelar"}
-                  />
-                </div>
-                <div>
-                  <ButtonComponent
-                    style={{
-                      fontSize: "12px",
-                      textTransform: "none",
-                      backgroundColor: "var(--blue-400)",
-                      boxShadow: "none",
-                      border: "1px solid var(--blue-400)",
-                    }}
-                    onClick={!imagePreviewerData ? takePicture : savePicture}
-                    buttonText={
-                      imagePreviewerData ? "Salvar foto" : "Tirar foto"
-                    }
-                    disabled={!stream?.active}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <ModalCameraComponent
+            imagePreviewerData={imagePreviewerData}
+            isCameraModalOpen={isCameraModalOpen}
+            loadCameraData={loadCameraData}
+            setFileData={setFileData}
+            setFileName={setFileName}
+            setImagePreviewerData={setImagePreviewerData}
+            setIsCameraModalOpen={setIsCameraModalOpen}
+            setLoadCameraData={setLoadCameraData}
+            stream={stream}
+          />
           <div
             style={{ display: isCameraModalOpen ? "none" : "block" }}
             className={style.modalContentWrapped}
