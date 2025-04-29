@@ -16,6 +16,11 @@ import { getGradesByInstituionId } from "@/app/actions/getGradesByInstitutionId"
 import { getPeriodsByInstituionId } from "@/app/actions/getPeriodsByInstitutionId";
 import ModalCameraComponent from "../ModalCameraComponent/ModalCameraComponent";
 import compressFile from "@/app/helpers/compressFile";
+import { registerChild } from "@/app/actions/registerChild";
+import { getPreSignedUploadURL } from "@/app/actions/getPreSignedUploadURL";
+import { updateChild } from "@/app/actions/updateChild";
+import postPictureToS3 from "@/app/actions/postPictureToS3";
+import { CircularProgress } from "@mui/material";
 
 export default function ModalRegisterComponent() {
   const { registerModalOpen, setRegisterModalOpen, userInfo } = useUser();
@@ -35,6 +40,7 @@ export default function ModalRegisterComponent() {
   const [fileData, setFileData] = useState<File | null>(null);
   const [loadCameraData, setLoadCameraData] = useState(false);
   const [stream, setStream] = useState<MediaStream | undefined>(undefined);
+  const [loadRegisterData, setLoadRegisterData] = useState(false);
 
   const modalContainer = useRef(null);
 
@@ -56,6 +62,7 @@ export default function ModalRegisterComponent() {
     setLoadCameraData(false);
     setStream(undefined);
     setBirthDate("");
+    setLoadRegisterData(false);
   };
 
   const handleCloseModal = () => {
@@ -66,17 +73,38 @@ export default function ModalRegisterComponent() {
     resetAllStatus();
   };
 
-  const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!userInfo || !fileData) return;
+    setLoadRegisterData(true);
     const parsedDate = parseDateWithDateFns(birthDate);
-    console.log({
+    const { child } = await registerChild({
       name,
+      birthDate: parsedDate,
+      periodId: period,
+      gradeId: grade,
       cpf,
-      period,
-      grade,
-      fileData,
-      birthDate: parsedDate?.toISOString(),
+      institutionId: userInfo.id,
     });
+
+    if (child.id) {
+      const presignedUrl = await getPreSignedUploadURL(
+        child.id,
+        fileData?.type
+      );
+      const url = new URL(presignedUrl);
+      const pictureUrl = `${url.origin}${url.pathname}`;
+      const response = await postPictureToS3(presignedUrl, fileData);
+      if (response.status === 200) {
+        await updateChild({
+          id: child.id,
+          picture: pictureUrl,
+        });
+      }
+    }
+    setLoadRegisterData(false);
+
+    handleCloseModal();
   };
   const handleStartCamera = async () => {
     try {
@@ -179,6 +207,7 @@ export default function ModalRegisterComponent() {
             <form className={style.formContainer} onSubmit={handleRegister}>
               <InputFieldComponent
                 required={true}
+                disabled={loadRegisterData}
                 idInput="name"
                 inputLabel="Nome completo"
                 style={{ textTransform: "capitalize" }}
@@ -188,6 +217,7 @@ export default function ModalRegisterComponent() {
                 placeholder="Ex: João da Silva Santos"
               />
               <InputFieldComponent
+                disabled={loadRegisterData}
                 required={true}
                 idInput="cpf"
                 inputLabel="CPF (somente números)"
@@ -197,6 +227,7 @@ export default function ModalRegisterComponent() {
                 placeholder="999.999.999-99"
               />
               <InputFieldComponent
+                disabled={loadRegisterData}
                 required={true}
                 idInput="birthDate"
                 inputLabel="Data de nascimento"
@@ -210,6 +241,7 @@ export default function ModalRegisterComponent() {
               />
               <SelectComponent
                 required
+                disabled={loadRegisterData}
                 selectId="period"
                 setSelectValue={setPeriod}
                 selectLabel="Período"
@@ -219,6 +251,7 @@ export default function ModalRegisterComponent() {
               />
               <SelectComponent
                 required
+                disabled={loadRegisterData}
                 selectId="grade"
                 setSelectValue={setGrade}
                 selectLabel="Turma"
@@ -308,9 +341,19 @@ export default function ModalRegisterComponent() {
                     cpf.length < 14 ||
                     !period ||
                     !grade ||
-                    !imagePreviewerData
+                    !imagePreviewerData ||
+                    loadRegisterData
                   }
-                  buttonText="Enviar"
+                  buttonText={
+                    loadRegisterData ? (
+                      <CircularProgress
+                        size={28}
+                        style={{ color: "#002F1A" }}
+                      />
+                    ) : (
+                      "Enviar"
+                    )
+                  }
                 />
               </div>
             </form>
