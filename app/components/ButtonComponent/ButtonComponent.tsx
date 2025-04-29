@@ -3,7 +3,7 @@ import { ButtonContainer } from "./styles";
 
 interface ButtonComponentProps extends ButtonProps {
   onClick?: (event: any) => void;
-  buttonText: string;
+  buttonText: string | React.JSX.Element;
 }
 
 export default function ButtonComponent({
