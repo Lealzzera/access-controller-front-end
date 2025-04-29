@@ -15,7 +15,7 @@ type ChildrenDataType = {
 };
 
 export default function HomePage() {
-  const { userInfo } = useUser();
+  const { userInfo, registerModalOpen } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
 
   const getChildrenListByUserId = async () => {
@@ -32,18 +32,25 @@ export default function HomePage() {
     getChildrenListByUserId();
   }, [userInfo]);
 
+  useEffect(() => {
+    if (!registerModalOpen) {
+      getChildrenListByUserId();
+    }
+  }, [registerModalOpen]);
+
   return (
     <section className={style.container}>
-      {childrenData.map((child) => (
-        <div key={child.id} className={style.containerCard}>
-          <CardInfoComponent
-            name={child.name}
-            period={child.period.name}
-            grade={child.grade.name}
-            pictureUrl={child.picture}
-          />
-        </div>
-      ))}
+      {childrenData &&
+        childrenData.map((child) => (
+          <div key={child.id} className={style.containerCard}>
+            <CardInfoComponent
+              name={child.name}
+              period={child.period.name}
+              grade={child.grade.name}
+              pictureUrl={child.picture}
+            />
+          </div>
+        ))}
     </section>
   );
 }
