@@ -5,7 +5,7 @@ type SelectOptionsType = {
   name: string;
 };
 
-type SelectComponentProps = {
+interface SelectComponentProps {
   selectName: string;
   selectOptions: SelectOptionsType[];
   selectId: string;
@@ -13,7 +13,8 @@ type SelectComponentProps = {
   setSelectValue: (value: any) => void;
   required?: boolean;
   labelText: string;
-};
+  disabled: boolean;
+}
 
 export default function SelectComponent({
   selectName,
@@ -23,6 +24,7 @@ export default function SelectComponent({
   setSelectValue,
   required,
   labelText,
+  disabled,
 }: SelectComponentProps) {
   return (
     <div>
@@ -37,6 +39,7 @@ export default function SelectComponent({
         className={style.selectComponent}
         id={selectId}
         name={selectName}
+        disabled={disabled}
       >
         <option value="" defaultValue={labelText ?? ""} hidden>
           {labelText}
