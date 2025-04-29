@@ -19,8 +19,8 @@ export default function CardInfoComponent({
       <div className={style.imageContainer}>
         <Image
           src={pictureUrl}
-          width={50}
-          height={50}
+          width={300}
+          height={300}
           alt={name}
           className={style.imgContent}
         />
