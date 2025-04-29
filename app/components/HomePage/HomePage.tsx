@@ -18,6 +18,7 @@ export default function HomePage() {
   const { userInfo, registerModalOpen } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
 
+  //TODO: FIX THIS METHOD TO GET CHILDLIST ACCORDING THE PAGE, CAUSE IT NEED A FILTER TO NOT LIST ALL KIDS FROM DB
   const getChildrenListByUserId = async () => {
     if (userInfo) {
       const response = await getChildrenList({
