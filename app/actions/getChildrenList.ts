@@ -11,7 +11,7 @@ type GetChildrenListType = {
 
 const getEndpointByRole = {
   [Role.INSTITUTION]: (id: string, page?: number) =>
-    `/children?institutionId=${id}${page ? `&page=${page}` : ""}&limit=10`,
+    `/children?institutionId=${id}${page ? `&page=${page}` : ""}&limit=30`,
   [Role.RESPONSIBLE]: (id: string) => `/children/by-responsible-id/${id}`,
 };
 
