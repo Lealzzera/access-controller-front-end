@@ -3,8 +3,10 @@
 import CardInfoComponent from "@/app/components/CardInfoComponent/CardInfoComponent";
 import style from "./style.module.css";
 import { useUser } from "@/app/context/userContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getChildrenList } from "@/app/actions/getChildrenList";
+import { CircularProgress } from "@mui/material";
+import { Skeleton } from "@mui/material";
 
 type ChildrenDataType = {
   id: string;
@@ -17,41 +19,97 @@ type ChildrenDataType = {
 export default function HomePage() {
   const { userInfo, registerModalOpen } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  //TODO: FIX THIS METHOD TO GET CHILDLIST ACCORDING THE PAGE, CAUSE IT NEED A FILTER TO NOT LIST ALL KIDS FROM DB
-  const getChildrenListByUserId = async () => {
-    if (userInfo) {
-      const response = await getChildrenList({
-        userInfo: { id: userInfo.id, role: userInfo.role },
+  const lastCardRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setCurrentPage((prev) => prev + 1);
+        }
       });
 
-      setChildrenData(response);
-    }
-  };
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+  const getChildrenListByUserId = useCallback(
+    async (page: number) => {
+      if (!userInfo) return;
+      setLoading(true);
+      const response = await getChildrenList({
+        userInfo: { id: userInfo.id, role: userInfo.role },
+        page,
+      });
 
-  useEffect(() => {
-    getChildrenListByUserId();
-  }, [userInfo]);
+      if (!response || response.length === 0) {
+        setHasMore(false);
+        setLoading(false);
+        return;
+      }
+
+      setChildrenData((prev) => [...prev, ...response]);
+      setLoading(false);
+    },
+    [userInfo]
+  );
 
   useEffect(() => {
     if (!registerModalOpen) {
-      getChildrenListByUserId();
+      setChildrenData([]);
+      setCurrentPage(1);
+      setHasMore(true);
     }
   }, [registerModalOpen]);
 
+  useEffect(() => {
+    if (userInfo && hasMore && !loading && !registerModalOpen) {
+      getChildrenListByUserId(currentPage);
+    }
+  }, [userInfo, currentPage, hasMore, registerModalOpen]);
+
   return (
-    <section className={style.container}>
-      {childrenData &&
-        childrenData.map((child) => (
-          <div key={child.id} className={style.containerCard}>
-            <CardInfoComponent
-              name={child.name}
-              period={child.period.name}
-              grade={child.grade.name}
-              pictureUrl={child.picture}
-            />
+    <>
+      {childrenData.length === 0 && loading && (
+        <div className={style.container}>
+          <Skeleton variant="rounded" className={style.skeletonComponent} />
+          <Skeleton variant="rounded" className={style.skeletonComponent} />
+          <Skeleton variant="rounded" className={style.skeletonComponent} />
+          <Skeleton variant="rounded" className={style.skeletonComponent} />
+          <Skeleton variant="rounded" className={style.skeletonComponent} />
+          <Skeleton variant="rounded" className={style.skeletonComponent} />
+        </div>
+      )}
+      <section className={style.container}>
+        {childrenData.map((child, index) => {
+          const isLastCard = index === childrenData.length - 1;
+          return (
+            <div
+              key={child.id}
+              className={style.containerCard}
+              ref={isLastCard ? lastCardRef : null}
+            >
+              <CardInfoComponent
+                name={child.name}
+                period={child.period.name}
+                grade={child.grade.name}
+                pictureUrl={child.picture}
+              />
+            </div>
+          );
+        })}
+        {loading && childrenData.length > 0 && (
+          <div className={style.circularProgressContainer}>
+            <CircularProgress className={style.circularProgress} />
           </div>
-        ))}
-    </section>
+        )}
+      </section>
+    </>
   );
 }

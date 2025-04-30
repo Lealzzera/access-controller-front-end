@@ -23,6 +23,7 @@ export default function CardInfoComponent({
           height={300}
           alt={name}
           className={style.imgContent}
+          priority
         />
       </div>
       <div className={style.infoContainer}>

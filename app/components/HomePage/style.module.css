@@ -15,6 +15,21 @@
   width: 300px;
 }
 
+.circularProgressContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.circularProgress {
+  color: var(--blue-200);
+}
+
+.skeletonComponent {
+  width: 300px;
+  font-size: 95px;
+}
+
 @media (min-width: 760px) {
   .container {
     display: grid;
@@ -24,7 +39,15 @@
     grid-auto-rows: min-content;
   }
 
+  .circularProgressContainer {
+    grid-column: 1 / -1;
+  }
+
   .containerCard {
+    width: 350px;
+  }
+
+  .skeletonComponent {
     width: 350px;
   }
 }
