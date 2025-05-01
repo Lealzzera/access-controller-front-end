@@ -16,24 +16,30 @@ import {
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/app/actions/loginUser";
+import { CircularProgress } from "@mui/material";
 
 export default function LoginPage() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const route = useRouter();
 
   const handleLogin = async () => {
     if (emailValue.length && passwordValue.length) {
+      setLoading(true);
       setErrorMessage("");
       const response = await loginUser({
         email: emailValue,
         password: passwordValue,
       });
       if (response.status !== 200) {
+        setLoading(false);
         setErrorMessage("Usuário ou senha inválidos.");
         return;
       }
+
+      setLoading(false);
       route.push("/home");
     }
   };
@@ -55,6 +61,7 @@ export default function LoginPage() {
             inputValue={emailValue}
             setInputValue={setEmailValue}
             required
+            disabled={loading}
           />
 
           <InputFieldComponent
@@ -65,6 +72,7 @@ export default function LoginPage() {
             inputType="password"
             inputValue={passwordValue}
             setInputValue={setPasswordValue}
+            disabled={loading}
           />
           <ErrorMessage>{errorMessage}</ErrorMessage>
         </WrappedFields>
@@ -72,7 +80,13 @@ export default function LoginPage() {
           <ButtonComponent
             disabled={!emailValue.length || !passwordValue.length}
             type="submit"
-            buttonText="Login"
+            buttonText={
+              !loading ? (
+                "Login"
+              ) : (
+                <CircularProgress size={28} style={{ color: "#fafafa" }} />
+              )
+            }
           />
         </ButtonContainer>
         <InfoContainer>

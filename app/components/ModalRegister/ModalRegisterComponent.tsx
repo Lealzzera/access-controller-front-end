@@ -21,6 +21,7 @@ import { getPreSignedUploadURL } from "@/app/actions/getPreSignedUploadURL";
 import { updateChild } from "@/app/actions/updateChild";
 import postPictureToS3 from "@/app/actions/postPictureToS3";
 import { CircularProgress } from "@mui/material";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function ModalRegisterComponent() {
   const { registerModalOpen, setRegisterModalOpen, userInfo } = useUser();
@@ -78,7 +79,7 @@ export default function ModalRegisterComponent() {
     if (!userInfo || !fileData) return;
     setLoadRegisterData(true);
     const parsedDate = parseDateWithDateFns(birthDate);
-    const { child } = await registerChild({
+    const responseRegister = await registerChild({
       name,
       birthDate: parsedDate,
       periodId: period,
@@ -87,23 +88,26 @@ export default function ModalRegisterComponent() {
       institutionId: userInfo.id,
     });
 
-    if (child.id) {
-      const presignedUrl = await getPreSignedUploadURL(
-        child.id,
-        fileData?.type
-      );
-      const url = new URL(presignedUrl);
-      const pictureUrl = `${url.origin}${url.pathname}`;
-      const response = await postPictureToS3(presignedUrl, fileData);
-      if (response.status === 200) {
-        await updateChild({
-          id: child.id,
-          picture: pictureUrl,
-        });
-      }
+    if (responseRegister.statusCode === 400) {
+      notifyError("CPF já cadastrado");
+      setLoadRegisterData(false);
+    }
+
+    const presignedUrl = await getPreSignedUploadURL(
+      responseRegister.child.id,
+      fileData?.type
+    );
+    const url = new URL(presignedUrl);
+    const pictureUrl = `${url.origin}${url.pathname}`;
+    const response = await postPictureToS3(presignedUrl, fileData);
+    if (response.status === 200) {
+      await updateChild({
+        id: responseRegister.child.id,
+        picture: pictureUrl,
+      });
     }
     setLoadRegisterData(false);
-
+    notifySuccess();
     handleCloseModal();
   };
   const handleStartCamera = async () => {
@@ -147,6 +151,26 @@ export default function ModalRegisterComponent() {
     }
   };
 
+  const notifySuccess = () =>
+    toast.success("Criança cadastrada com sucesso!", {
+      autoClose: 5000,
+      theme: "colored",
+      pauseOnHover: false,
+      closeOnClick: true,
+      hideProgressBar: true,
+      containerId: "success-container",
+    });
+
+  const notifyError = (message?: string) =>
+    toast.error(`Erro ao cadastrar criança ${message}`, {
+      autoClose: 5000,
+      theme: "colored",
+      pauseOnHover: false,
+      closeOnClick: true,
+      hideProgressBar: true,
+      containerId: "error-container",
+    });
+
   useEffect(() => {
     if (!userInfo?.id) return;
     const fetchData = async () => {
@@ -169,12 +193,14 @@ export default function ModalRegisterComponent() {
 
   return (
     <>
+      <ToastContainer containerId="success-container" />
       {registerModalOpen && (
         <div
           onClick={handleCloseModalClickingOutside}
           ref={modalContainer}
           className={`${style.modalContainer}`}
         >
+          <ToastContainer containerId="error-container" />
           <ModalCameraComponent
             imagePreviewerData={imagePreviewerData}
             isCameraModalOpen={isCameraModalOpen}

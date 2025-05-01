@@ -37,13 +37,7 @@ export async function registerChild({
 
     const data = await response.json();
 
-    if (response.status !== 201) {
-      return {
-        status: data.statusCode,
-        message: data.message || "Error to register a child.",
-      };
-    }
-    return { child: data.child, status: 200 };
+    return data;
   } catch (error: unknown) {
     console.error("Error to register:", error);
     return {
