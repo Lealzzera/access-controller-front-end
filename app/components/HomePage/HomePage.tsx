@@ -91,7 +91,7 @@ export default function HomePage() {
         {childrenData.length === 0 && !loading && <div className={style.noChildrenData}>
           <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
           <div className={style.registerChildButton}>
-            <ButtonComponent onClick={() => setRegisterModalOpen(true)} buttonText="Cadastrar"/>
+            <ButtonComponent style={{cursor: 'pointer'}} onClick={() => setRegisterModalOpen(true)} buttonText="Cadastrar"/>
           </div>
           </div>}
         {childrenData.map((child, index) => {
