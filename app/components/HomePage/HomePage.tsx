@@ -22,7 +22,7 @@ export default function HomePage() {
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const observer = useRef<IntersectionObserver | null>(null);
 
   const lastCardRef = useCallback(
@@ -88,7 +88,7 @@ export default function HomePage() {
         </div>
       )}
       <section className={style.container}>
-        {childrenData.length === 0 && !loading && <div className={style.noChildrenData}>
+        {childrenData.length === 0 && !loading && loading !== undefined &&  <div className={style.noChildrenData}>
           <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
           <div className={style.registerChildButton}>
             <ButtonComponent style={{cursor: 'pointer'}} onClick={() => setRegisterModalOpen(true)} buttonText="Cadastrar"/>

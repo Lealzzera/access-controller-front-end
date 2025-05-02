@@ -1,5 +1,9 @@
-import Image from "next/image";
+'use client'
+
+import Image, { StaticImageData } from "next/image";
 import style from "./style.module.css";
+import { useState } from "react";
+import imageError from "@/app/assets/error-image.png"
 
 type CardInfoComponentProps = {
   name: string;
@@ -14,16 +18,19 @@ export default function CardInfoComponent({
   grade,
   pictureUrl,
 }: CardInfoComponentProps) {
+  const [imageSrc, setImageSrc] = useState<StaticImageData | string>(pictureUrl)
+
   return (
     <div className={style.cardContainer}>
       <div className={style.imageContainer}>
         <Image
-          src={pictureUrl}
+          src={imageSrc}
           width={300}
           height={300}
           alt={name}
           className={style.imgContent}
           priority
+          onError={() => setImageSrc(imageError)}
         />
       </div>
       <div className={style.infoContainer}>
