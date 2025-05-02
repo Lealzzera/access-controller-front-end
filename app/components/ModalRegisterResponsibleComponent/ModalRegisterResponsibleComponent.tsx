@@ -11,7 +11,11 @@ import Image from 'next/image';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 export default function ModalRegisterResponsibleComponent() {
-  const { registerResponsibleModalOpen, setRegisterResponsibleModalOpen } = useUser();
+  const {
+    registerResponsibleModalOpen,
+    setRegisterResponsibleModalOpen,
+    lastChildRegisteredInformation,
+  } = useUser();
 
   const [loadRegisterData, setLoadRegisterData] = useState(false);
   const [imagePreviewerData, setImagePreviewerData] = useState('');
@@ -47,7 +51,10 @@ export default function ModalRegisterResponsibleComponent() {
             <div className={style.registerInformationText}>
               <h1 className={style.modalTitle}>Cadastrar responsável</h1>
               <p className={style.modalDescription}>
-                Vamos cadastrar um responsável para o <span>FULANO.</span>
+                Vamos cadastrar um responsável para o{' '}
+                <span>
+                  {lastChildRegisteredInformation ? lastChildRegisteredInformation.name : 'teste'}
+                </span>
               </p>
             </div>
             <form className={style.registerForm}>

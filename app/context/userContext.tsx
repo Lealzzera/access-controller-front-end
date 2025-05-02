@@ -14,6 +14,12 @@ type User = {
   userInfo: Responsible | Institution;
 };
 
+type LastChildRegisteredInformationType = {
+  name: string;
+  id: string;
+  cpf: string;
+};
+
 type UserContextType = {
   userInfo: User | undefined;
   setUserInfo: (user: User) => void;
@@ -21,6 +27,8 @@ type UserContextType = {
   setRegisterModalOpen: (value: boolean) => void;
   registerResponsibleModalOpen: boolean;
   setRegisterResponsibleModalOpen: (value: boolean) => void;
+  lastChildRegisteredInformation: LastChildRegisteredInformationType | undefined;
+  setLastChildRegisteredInformation: (value: LastChildRegisteredInformationType) => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -29,6 +37,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [userInfo, setUserInfo] = useState<User | undefined>(undefined);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [registerResponsibleModalOpen, setRegisterResponsibleModalOpen] = useState(false);
+  const [lastChildRegisteredInformation, setLastChildRegisteredInformation] = useState<
+    LastChildRegisteredInformationType | undefined
+  >(undefined);
 
   const settingInitialUserConfig = async () => {
     const localStorage = window.localStorage.getItem('userData');
@@ -75,6 +86,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setRegisterModalOpen,
         registerResponsibleModalOpen,
         setRegisterResponsibleModalOpen,
+        lastChildRegisteredInformation,
+        setLastChildRegisteredInformation,
       }}
     >
       {children}
