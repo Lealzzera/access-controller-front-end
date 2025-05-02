@@ -25,6 +25,8 @@ type UserContextType = {
   setUserInfo: (user: User) => void;
   registerModalOpen: boolean;
   setRegisterModalOpen: (value: boolean) => void;
+  registerResponsibleModalOpen: boolean;
+  setRegisterResponsibleModalOpen: (value: boolean) => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -32,6 +34,8 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [userInfo, setUserInfo] = useState<User | undefined>(undefined);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [registerResponsibleModalOpen, setRegisterResponsibleModalOpen] =
+    useState(false);
 
   const settingInitialUserConfig = async () => {
     const localStorage = window.localStorage.getItem("userData");
@@ -71,7 +75,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ userInfo, setUserInfo, registerModalOpen, setRegisterModalOpen }}
+      value={{
+        userInfo,
+        setUserInfo,
+        registerModalOpen,
+        setRegisterModalOpen,
+        registerResponsibleModalOpen,
+        setRegisterResponsibleModalOpen,
+      }}
     >
       {children}
     </UserContext.Provider>
