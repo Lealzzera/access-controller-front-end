@@ -15,6 +15,26 @@
   width: 300px;
 }
 
+.noChildrenData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.noChildrenDataTitle {
+  text-align: center;
+  font-weight: 400;
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.registerChildButton {
+  width: 200px;
+}
+
 .circularProgressContainer {
   width: 100%;
   display: flex;
@@ -31,6 +51,11 @@
 }
 
 @media (min-width: 760px) {
+  .noChildrenData {
+    grid-column: 1 / -1;
+    height: 50vh;
+  }
+
   .container {
     display: grid;
     grid-template-columns: 1fr 1fr;

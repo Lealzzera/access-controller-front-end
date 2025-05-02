@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getChildrenList } from "@/app/actions/getChildrenList";
 import { CircularProgress } from "@mui/material";
 import { Skeleton } from "@mui/material";
+import ButtonComponent from "../ButtonComponent/ButtonComponent";
 
 type ChildrenDataType = {
   id: string;
@@ -17,7 +18,7 @@ type ChildrenDataType = {
 };
 
 export default function HomePage() {
-  const { userInfo, registerModalOpen } = useUser();
+  const { userInfo, registerModalOpen, setRegisterModalOpen } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -87,6 +88,12 @@ export default function HomePage() {
         </div>
       )}
       <section className={style.container}>
+        {childrenData.length === 0 && !loading && <div className={style.noChildrenData}>
+          <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
+          <div className={style.registerChildButton}>
+            <ButtonComponent onClick={() => setRegisterModalOpen(true)} buttonText="Cadastrar"/>
+          </div>
+          </div>}
         {childrenData.map((child, index) => {
           const isLastCard = index === childrenData.length - 1;
           return (

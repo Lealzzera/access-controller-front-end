@@ -35,6 +35,7 @@ export default function ModalCameraComponent({
     const photoContent = photoContainer?.getElementsByTagName("img");
 
     if (photoContent) {
+      console.log('photocontent')
       const photoContentList = Array.from(photoContent)[0];
       photoContainer?.removeChild(photoContentList);
     }
