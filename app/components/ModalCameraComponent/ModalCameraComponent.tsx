@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Skeleton } from "@mui/material";
-import style from "./style.module.css";
-import ButtonComponent from "../ButtonComponent/ButtonComponent";
-import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
-import { base64ToBlobConverter } from "@/app/helpers/base64ToBlobConverter";
-import compressFile from "@/app/helpers/compressFile";
+import { Skeleton } from '@mui/material';
+import style from './style.module.css';
+import ButtonComponent from '../ButtonComponent/ButtonComponent';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import { base64ToBlobConverter } from '@/app/helpers/base64ToBlobConverter';
+import compressFile from '@/app/helpers/compressFile';
 
 type ModalCameraComponentProps = {
   isCameraModalOpen: boolean;
@@ -31,11 +31,11 @@ export default function ModalCameraComponent({
 }: ModalCameraComponentProps) {
   const handleTakeAnotherPicture = () => {
     setImagePreviewerData(undefined);
-    const photoContainer = document.getElementById("photo");
-    const photoContent = photoContainer?.getElementsByTagName("img");
+    const photoContainer = document.getElementById('photo');
+    const photoContent = photoContainer?.getElementsByTagName('img');
 
     if (photoContent) {
-      console.log('photocontent')
+      console.log('photocontent');
       const photoContentList = Array.from(photoContent)[0];
       photoContainer?.removeChild(photoContentList);
     }
@@ -45,33 +45,35 @@ export default function ModalCameraComponent({
   const takePicture = async () => {
     if (!stream?.active) return;
     if (imagePreviewerData?.length) return;
-    const video = document.getElementById("camera") as HTMLVideoElement;
-    const canvas = document.getElementById("snapshot") as HTMLCanvasElement;
-    const photoContainer = document.getElementById("photo");
+    const video = document.getElementById('camera') as HTMLVideoElement;
+    const canvas = document.getElementById('snapshot') as HTMLCanvasElement;
+    const photoContainer = document.getElementById('photo');
 
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext('2d');
     if (context && photoContainer) {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const imageDataURL = canvas.toDataURL("image/png");
-      const imageContent = document.createElement("img");
+      const imageDataURL = canvas.toDataURL('image/png');
+      const imageContent = document.createElement('img');
       const screenSize = window.innerWidth;
 
-      imageContent.style.width = screenSize >= 760 ? "480px" : "280px";
-      imageContent.style.borderRadius = "8px";
-      imageContent.style.marginTop = "8px";
+      imageContent.style.width = screenSize >= 760 ? '480px' : '280px';
+      imageContent.style.borderRadius = '8px';
+      imageContent.style.marginTop = '8px';
       imageContent.src = imageDataURL;
 
       photoContainer.appendChild(imageContent);
 
       const blobFile = base64ToBlobConverter(imageDataURL);
-      const file = new File([blobFile], "foto.jpg", { type: blobFile.type });
+      const file = new File([blobFile], 'foto.jpg', {
+        type: blobFile.type,
+      });
 
       const finalFile = await compressFile(file);
       setFileData(finalFile);
       const url = URL.createObjectURL(finalFile);
       setImagePreviewerData(url);
-      setFileName("");
+      setFileName('');
     }
   };
 
@@ -98,11 +100,13 @@ export default function ModalCameraComponent({
         <div className={style.modalCamera}>
           <div
             style={{
-              display: !loadCameraData && stream?.active ? "block" : "none",
+              display: !loadCameraData && stream?.active ? 'block' : 'none',
             }}
           >
             <video
-              style={{ display: !imagePreviewerData ? "block" : "none" }}
+              style={{
+                display: !imagePreviewerData ? 'block' : 'none',
+              }}
               className={style.videoCamera}
               id="camera"
               autoPlay
@@ -112,7 +116,9 @@ export default function ModalCameraComponent({
                 id="snapshot"
                 width="640"
                 height="480"
-                style={{ display: "none" }}
+                style={{
+                  display: 'none',
+                }}
               ></canvas>
               <div id="photo" className={style.photoContainer}></div>
             </>
@@ -122,22 +128,25 @@ export default function ModalCameraComponent({
             <div
               className={style.videoCamera}
               style={{
-                height: "100%",
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column',
               }}
             >
               <ErrorOutlinedIcon
-                style={{ fontSize: "80px", color: "rgba(0, 0, 0, 0.6)" }}
+                style={{
+                  fontSize: '80px',
+                  color: 'rgba(0, 0, 0, 0.6)',
+                }}
               />
               <p
                 style={{
-                  textAlign: "center",
-                  color: "rgba(0, 0, 0, 0.6)",
-                  fontWeight: "bold",
+                  textAlign: 'center',
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  fontWeight: 'bold',
                 }}
               >
                 Libere o acesso a câmera nas configurações do navegador.
@@ -149,8 +158,8 @@ export default function ModalCameraComponent({
               animation="pulse"
               className={style.videoCamera}
               style={{
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                height: "100%",
+                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                height: '100%',
               }}
               variant="rectangular"
             />
@@ -159,33 +168,29 @@ export default function ModalCameraComponent({
             <div>
               <ButtonComponent
                 style={{
-                  fontSize: "12px",
-                  textTransform: "none",
-                  backgroundColor: "transparent",
-                  color: "var(--red-600)",
-                  border: "1px solid var(--red-600)",
-                  fontWeight: "bold",
-                  boxShadow: "none",
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'var(--red-600)',
+                  border: '1px solid var(--red-600)',
+                  fontWeight: 'bold',
+                  boxShadow: 'none',
                 }}
-                onClick={
-                  imagePreviewerData
-                    ? handleTakeAnotherPicture
-                    : cancelTakePicture
-                }
-                buttonText={"Cancelar"}
+                onClick={imagePreviewerData ? handleTakeAnotherPicture : cancelTakePicture}
+                buttonText={'Cancelar'}
               />
             </div>
             <div>
               <ButtonComponent
                 style={{
-                  fontSize: "12px",
-                  textTransform: "none",
-                  backgroundColor: "var(--blue-400)",
-                  boxShadow: "none",
-                  border: "1px solid var(--blue-400)",
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  backgroundColor: 'var(--blue-400)',
+                  boxShadow: 'none',
+                  border: '1px solid var(--blue-400)',
                 }}
                 onClick={!imagePreviewerData ? takePicture : savePicture}
-                buttonText={imagePreviewerData ? "Salvar foto" : "Tirar foto"}
+                buttonText={imagePreviewerData ? 'Salvar foto' : 'Tirar foto'}
                 disabled={!stream?.active}
               />
             </div>

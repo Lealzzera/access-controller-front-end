@@ -1,21 +1,21 @@
-"use server";
+'use server';
 
-import { apiClient } from "./apiClient";
+import { apiClient } from './apiClient';
 
 export async function getGradesByInstituionId(institutionId: string) {
   try {
     const response = await apiClient({
       path: `/grade/${institutionId}`,
-      method: "GET",
+      method: 'GET',
     });
 
     const { grades } = await response.json();
     return grades;
   } catch (error: unknown) {
-    console.error("Erro ao buscar os dados:", error);
+    console.error('Erro ao buscar os dados:', error);
     return {
       status: 500,
-      message: "Erro interno no servidor. Tente novamente mais tarde.",
+      message: 'Erro interno no servidor. Tente novamente mais tarde.',
     };
   }
 }

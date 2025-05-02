@@ -1,19 +1,25 @@
-"use client";
+'use client';
 
-import CardInfoComponent from "@/app/components/CardInfoComponent/CardInfoComponent";
-import style from "./style.module.css";
-import { useUser } from "@/app/context/userContext";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getChildrenList } from "@/app/actions/getChildrenList";
-import { CircularProgress } from "@mui/material";
-import { Skeleton } from "@mui/material";
-import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import CardInfoComponent from '@/app/components/CardInfoComponent/CardInfoComponent';
+import style from './style.module.css';
+import { useUser } from '@/app/context/userContext';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getChildrenList } from '@/app/actions/getChildrenList';
+import { CircularProgress } from '@mui/material';
+import { Skeleton } from '@mui/material';
+import ButtonComponent from '../ButtonComponent/ButtonComponent';
 
 type ChildrenDataType = {
   id: string;
   name: string;
-  period: { id: string; name: string };
-  grade: { id: string; name: string };
+  period: {
+    id: string;
+    name: string;
+  };
+  grade: {
+    id: string;
+    name: string;
+  };
   picture: string;
 };
 
@@ -45,7 +51,10 @@ export default function HomePage() {
       if (!userInfo) return;
       setLoading(true);
       const response = await getChildrenList({
-        userInfo: { id: userInfo.id, role: userInfo.role },
+        userInfo: {
+          id: userInfo.id,
+          role: userInfo.role,
+        },
         page,
       });
 
@@ -88,12 +97,20 @@ export default function HomePage() {
         </div>
       )}
       <section className={style.container}>
-        {childrenData.length === 0 && !loading && loading !== undefined &&  <div className={style.noChildrenData}>
-          <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
-          <div className={style.registerChildButton}>
-            <ButtonComponent style={{cursor: 'pointer'}} onClick={() => setRegisterModalOpen(true)} buttonText="Cadastrar"/>
+        {childrenData.length === 0 && !loading && loading !== undefined && (
+          <div className={style.noChildrenData}>
+            <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
+            <div className={style.registerChildButton}>
+              <ButtonComponent
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={() => setRegisterModalOpen(true)}
+                buttonText="Cadastrar"
+              />
+            </div>
           </div>
-          </div>}
+        )}
         {childrenData.map((child, index) => {
           const isLastCard = index === childrenData.length - 1;
           return (

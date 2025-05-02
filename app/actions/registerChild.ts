@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { apiClient } from "./apiClient";
+import { apiClient } from './apiClient';
 
 interface RegisterChildData {
   name: string;
@@ -30,8 +30,8 @@ export async function registerChild({
     });
 
     const response = await apiClient({
-      path: "/children/register",
-      method: "POST",
+      path: '/children/register',
+      method: 'POST',
       body,
     });
 
@@ -39,10 +39,10 @@ export async function registerChild({
 
     return data;
   } catch (error: unknown) {
-    console.error("Error to register:", error);
+    console.error('Error to register:', error);
     return {
       status: 500,
-      message: "Internal error server, try it again later.",
+      message: 'Internal error server, try it again later.',
     };
   }
 }

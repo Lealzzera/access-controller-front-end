@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 export default async function logout() {
   const cookieStore = cookies();
-  (await cookieStore).delete("access_token");
+  (await cookieStore).delete('access_token');
 }

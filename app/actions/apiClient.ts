@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 
 type ApiClientType = {
   path: string;
@@ -7,25 +7,18 @@ type ApiClientType = {
   body?: BodyInit | null | undefined;
 };
 
-export async function apiClient({
-  path,
-  method,
-  headers,
-  body,
-}: ApiClientType) {
-  const userTokenFromCookie = (await cookies()).get("access_token");
+export async function apiClient({ path, method, headers, body }: ApiClientType) {
+  const userTokenFromCookie = (await cookies()).get('access_token');
 
   const response = await fetch(`${process.env.BACKEND_URL}${path}`, {
     method,
     headers: {
       ...headers,
-      Authorization: userTokenFromCookie
-        ? `Bearer: ${userTokenFromCookie.value}`
-        : "",
-      "Content-Type": "application/json",
+      Authorization: userTokenFromCookie ? `Bearer: ${userTokenFromCookie.value}` : '',
+      'Content-Type': 'application/json',
     },
     body,
-    credentials: "include",
+    credentials: 'include',
   });
 
   return response;

@@ -1,8 +1,8 @@
-import { InputProps } from "@mui/material";
-import { InputField, InputLabel } from "./styles";
+import { InputProps } from '@mui/material';
+import { InputField, InputLabel } from './styles';
 
 interface InputFieldComponentProps extends InputProps {
-  inputType: "text" | "email" | "password";
+  inputType: 'text' | 'email' | 'password';
   inputValue: string;
   idInput: string;
   inputLabel: string;
@@ -12,7 +12,7 @@ interface InputFieldComponentProps extends InputProps {
 }
 
 export default function InputFieldComponent({
-  inputType = "text",
+  inputType = 'text',
   inputValue,
   idInput,
   inputLabel,
@@ -23,13 +23,13 @@ export default function InputFieldComponent({
 }: InputFieldComponentProps) {
   return (
     <div>
-      <InputLabel className={required ? "required" : ""} htmlFor={idInput}>
+      <InputLabel className={required ? 'required' : ''} htmlFor={idInput}>
         {inputLabel}
       </InputLabel>
       {/* TODO: CHANGE THIS INPUT TO A NORMAL INPUT REMOVING THE STYLED COMPONENTS */}
       <InputField
         {...props}
-        className={showError ? "error" : ""}
+        className={showError ? 'error' : ''}
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
         type={inputType}

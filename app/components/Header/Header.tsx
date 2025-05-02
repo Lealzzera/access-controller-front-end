@@ -1,19 +1,18 @@
-"use client";
-import { useUser } from "@/app/context/userContext";
-import style from "./style.module.css";
-import logout from "@/app/helpers/logout";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Role } from "@/app/enums/Role.enum";
-import MenuIcon from "@mui/icons-material/Menu";
-import { Menu, MenuItem } from "@mui/material";
-import React from "react";
+'use client';
+import { useUser } from '@/app/context/userContext';
+import style from './style.module.css';
+import logout from '@/app/helpers/logout';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Role } from '@/app/enums/Role.enum';
+import MenuIcon from '@mui/icons-material/Menu';
+import { Menu, MenuItem } from '@mui/material';
+import React from 'react';
 
 export default function Header() {
   const router = useRouter();
-  const { userInfo, setRegisterModalOpen, setRegisterResponsibleModalOpen } =
-    useUser();
-  const [userName, setUserName] = useState<string | undefined>("");
+  const { userInfo, setRegisterModalOpen, setRegisterResponsibleModalOpen } = useUser();
+  const [userName, setUserName] = useState<string | undefined>('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -29,7 +28,7 @@ export default function Header() {
     await logout();
     handleCloseMenu();
     window.localStorage.clear();
-    router.push("/");
+    router.push('/');
   };
 
   const handleRegisterChildFunction = () => {
@@ -56,15 +55,8 @@ export default function Header() {
             <button className={style.buttonMenu} onClick={handleClick}>
               <MenuIcon />
             </button>
-            <Menu
-              onClose={handleCloseMenu}
-              id="basic-menu"
-              open={open}
-              anchorEl={anchorEl}
-            >
-              <MenuItem onClick={handleRegisterChildFunction}>
-                Cadastrar Criança
-              </MenuItem>
+            <Menu onClose={handleCloseMenu} id="basic-menu" open={open} anchorEl={anchorEl}>
+              <MenuItem onClick={handleRegisterChildFunction}>Cadastrar Criança</MenuItem>
               {/* TODO: REMOVE THIS MENUITEM BUTTON IN THE FUTURE CAUSE 
               THE LOGIC TO REGISTER A RESPONSIBLE HAS BEEN CHANGED */}
               <MenuItem onClick={handleOpenRegisterResponsibleModal}>
@@ -74,9 +66,7 @@ export default function Header() {
             </Menu>
           </div>
         )}
-        {userInfo?.role === Role.RESPONSIBLE && (
-          <p onClick={logoutFunction}>SAIR</p>
-        )}
+        {userInfo?.role === Role.RESPONSIBLE && <p onClick={logoutFunction}>SAIR</p>}
       </div>
     </header>
   );

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { SyntheticEvent, useState } from "react";
-import InputFieldComponent from "../InputFieldComponent/InputFieldComponent";
+import { SyntheticEvent, useState } from 'react';
+import InputFieldComponent from '../InputFieldComponent/InputFieldComponent';
 import {
   ButtonContainer,
   CreateAccountLink,
@@ -12,35 +12,35 @@ import {
   LoginPageForm,
   LoginTitle,
   WrappedFields,
-} from "./styles";
-import ButtonComponent from "../ButtonComponent/ButtonComponent";
-import { useRouter } from "next/navigation";
-import { loginUser } from "@/app/actions/loginUser";
-import { CircularProgress } from "@mui/material";
+} from './styles';
+import ButtonComponent from '../ButtonComponent/ButtonComponent';
+import { useRouter } from 'next/navigation';
+import { loginUser } from '@/app/actions/loginUser';
+import { CircularProgress } from '@mui/material';
 
 export default function LoginPage() {
-  const [emailValue, setEmailValue] = useState("");
-  const [passwordValue, setPasswordValue] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [emailValue, setEmailValue] = useState('');
+  const [passwordValue, setPasswordValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const route = useRouter();
 
   const handleLogin = async () => {
     if (emailValue.length && passwordValue.length) {
       setLoading(true);
-      setErrorMessage("");
+      setErrorMessage('');
       const response = await loginUser({
         email: emailValue,
         password: passwordValue,
       });
       if (response.status !== 200) {
         setLoading(false);
-        setErrorMessage("Usuário ou senha inválidos.");
+        setErrorMessage('Usuário ou senha inválidos.');
         return;
       }
 
       setLoading(false);
-      route.push("/home");
+      route.push('/home');
     }
   };
 
@@ -82,9 +82,14 @@ export default function LoginPage() {
             type="submit"
             buttonText={
               !loading ? (
-                "Login"
+                'Login'
               ) : (
-                <CircularProgress size={28} style={{ color: "#fafafa" }} />
+                <CircularProgress
+                  size={28}
+                  style={{
+                    color: '#fafafa',
+                  }}
+                />
               )
             }
           />

@@ -22,6 +22,6 @@
 }
 
 .required::after {
-  content: "*";
+  content: '*';
   color: var(--red-600);
 }

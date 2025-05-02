@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { apiClient } from "./apiClient";
+import { apiClient } from './apiClient';
 
 interface UpdateChildData {
   id: string;
@@ -30,7 +30,7 @@ export async function updateChild({
 
     const response = await apiClient({
       path: `/children/${id}`,
-      method: "PATCH",
+      method: 'PATCH',
       body,
     });
 
@@ -39,15 +39,18 @@ export async function updateChild({
     if (response.status !== 200) {
       return {
         status: data.statusCode,
-        message: data.message || "Erro ao atualizar os dados.",
+        message: data.message || 'Erro ao atualizar os dados.',
       };
     }
-    return { child: data.child, status: 200 };
+    return {
+      child: data.child,
+      status: 200,
+    };
   } catch (error: unknown) {
-    console.error("Erro ao realizar login:", error);
+    console.error('Erro ao realizar login:', error);
     return {
       status: 500,
-      message: "Erro interno no servidor. Tente novamente mais tarde.",
+      message: 'Erro interno no servidor. Tente novamente mais tarde.',
     };
   }
 }

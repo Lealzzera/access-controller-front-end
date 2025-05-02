@@ -1,25 +1,22 @@
-"use server";
+'use server';
 
-import { apiClient } from "./apiClient";
+import { apiClient } from './apiClient';
 
-export async function getPreSignedUploadURL(
-  photoId: string,
-  fileType: string | undefined
-) {
+export async function getPreSignedUploadURL(photoId: string, fileType: string | undefined) {
   try {
     const response = await apiClient({
       path: `/uploads/generate-presigned-url?fileName=child/${photoId}&fileType=${fileType}`,
-      method: "GET",
+      method: 'GET',
     });
 
     const { url } = await response.json();
 
     return url;
   } catch (error: unknown) {
-    console.error("Error to get the pre signed URL: ", error);
+    console.error('Error to get the pre signed URL: ', error);
     return {
       status: 500,
-      message: "Internal server error. Try it again later.",
+      message: 'Internal server error. Try it again later.',
     };
   }
 }

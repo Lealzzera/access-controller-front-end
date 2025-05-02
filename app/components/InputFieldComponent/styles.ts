@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const InputField = styled.input`
   padding: 10px;
@@ -26,7 +26,7 @@ export const InputLabel = styled.label`
   display: block;
 
   &.required::after {
-    content: "*";
+    content: '*';
     color: var(--red-600);
   }
 `;

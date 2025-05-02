@@ -1,5 +1,5 @@
-import Header from "../components/Header/Header";
-import { UserProvider } from "../context/userContext";
+import Header from '../components/Header/Header';
+import { UserProvider } from '../context/userContext';
 
 export default function RootLayout({
   children,

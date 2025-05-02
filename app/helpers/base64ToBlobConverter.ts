@@ -1,5 +1,5 @@
 export const base64ToBlobConverter = (base64File: any) => {
-  const parts = base64File.split(",");
+  const parts = base64File.split(',');
   const contentType = parts[0].match(/:(.*?);/)[1];
   const byteCharacters = atob(parts[1]);
   const byteNumbers = new Array(byteCharacters.length);
@@ -9,5 +9,7 @@ export const base64ToBlobConverter = (base64File: any) => {
   }
   const byteArray = new Uint8Array(byteNumbers);
 
-  return new Blob([byteArray], { type: contentType });
+  return new Blob([byteArray], {
+    type: contentType,
+  });
 };

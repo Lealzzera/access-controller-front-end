@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import Image, { StaticImageData } from "next/image";
-import style from "./style.module.css";
-import { useState } from "react";
-import imageError from "@/app/assets/error-image.png"
+import Image, { StaticImageData } from 'next/image';
+import style from './style.module.css';
+import { useState } from 'react';
+import imageError from '@/app/assets/error-image.png';
 
 type CardInfoComponentProps = {
   name: string;
@@ -18,7 +18,7 @@ export default function CardInfoComponent({
   grade,
   pictureUrl,
 }: CardInfoComponentProps) {
-  const [imageSrc, setImageSrc] = useState<StaticImageData | string>(pictureUrl)
+  const [imageSrc, setImageSrc] = useState<StaticImageData | string>(pictureUrl);
 
   return (
     <div className={style.cardContainer}>
@@ -48,7 +48,8 @@ export default function CardInfoComponent({
         </p>
         <p className={style.statusContainer}>
           <span className={style.titleInfo}>Status: </span>
-          <span className={style.active}></span>Ativo
+          <span className={style.active}></span>
+          Ativo
         </p>
       </div>
     </div>

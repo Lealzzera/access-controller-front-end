@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const LoginPageContainer = styled.section`
   background-color: var(--blue-200);

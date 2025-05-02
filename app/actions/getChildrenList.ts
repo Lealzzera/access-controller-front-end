@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import { Role } from "../enums/Role.enum";
-import { UserInfoType } from "../types/userInfo.type";
-import { apiClient } from "./apiClient";
+import { Role } from '../enums/Role.enum';
+import { UserInfoType } from '../types/userInfo.type';
+import { apiClient } from './apiClient';
 
 type GetChildrenListType = {
   userInfo: UserInfoType;
@@ -11,7 +11,7 @@ type GetChildrenListType = {
 
 const getEndpointByRole = {
   [Role.INSTITUTION]: (id: string, page?: number) =>
-    `/children?institutionId=${id}${page ? `&page=${page}` : ""}&limit=10`,
+    `/children?institutionId=${id}${page ? `&page=${page}` : ''}&limit=10`,
   [Role.RESPONSIBLE]: (id: string) => `/children/by-responsible-id/${id}`,
 };
 
@@ -21,21 +21,24 @@ export async function getChildrenList({ userInfo, page }: GetChildrenListType) {
     if (!currentEndpoint) {
       return {
         status: 400,
-        message: "Invalid Role to get the actual endpoint.",
+        message: 'Invalid Role to get the actual endpoint.',
       };
     }
 
     const endpoint = currentEndpoint(userInfo.id, page);
-    const response = await apiClient({ path: endpoint, method: "GET" });
+    const response = await apiClient({
+      path: endpoint,
+      method: 'GET',
+    });
 
     const { children } = await response.json();
 
     return children;
   } catch (error: unknown) {
-    console.error("Erro ao buscar os dados:", error);
+    console.error('Erro ao buscar os dados:', error);
     return {
       status: 500,
-      message: "Erro interno no servidor. Tente novamente mais tarde.",
+      message: 'Erro interno no servidor. Tente novamente mais tarde.',
     };
   }
 }

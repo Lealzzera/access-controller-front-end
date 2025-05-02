@@ -1,4 +1,4 @@
-import style from "./style.module.css";
+import style from './style.module.css';
 
 type SelectOptionsType = {
   id?: string | number;
@@ -29,7 +29,7 @@ export default function SelectComponent({
   return (
     <div>
       <label
-        className={`${style.selectLabel} ${required ? style.required : ""}`}
+        className={`${style.selectLabel} ${required ? style.required : ''}`}
         htmlFor={selectId}
       >
         {selectLabel}
@@ -41,7 +41,7 @@ export default function SelectComponent({
         name={selectName}
         disabled={disabled}
       >
-        <option value="" defaultValue={labelText ?? ""} hidden>
+        <option value="" defaultValue={labelText ?? ''} hidden>
           {labelText}
         </option>
         {selectOptions.map((option) => (

@@ -1,12 +1,15 @@
-"use client";
+'use client';
 
-import { useUser } from "@/app/context/userContext";
-import style from "./style.module.css";
-import { SyntheticEvent, useRef } from "react";
+import { useUser } from '@/app/context/userContext';
+import style from './style.module.css';
+import { SyntheticEvent, useRef, useState } from 'react';
+import InputFieldComponent from '../InputFieldComponent/InputFieldComponent';
 
 export default function ModalRegisterResponsibleComponent() {
-  const { registerResponsibleModalOpen, setRegisterResponsibleModalOpen } =
-    useUser();
+  const { registerResponsibleModalOpen, setRegisterResponsibleModalOpen } = useUser();
+
+  const [responsibleName, setResponsibleName] = useState('');
+
   const modalBg = useRef<HTMLDivElement | null>(null);
 
   const handleClickOutSide = (event: SyntheticEvent) => {
@@ -17,17 +20,43 @@ export default function ModalRegisterResponsibleComponent() {
   return (
     <>
       {registerResponsibleModalOpen && (
-        <div
-          ref={modalBg}
-          onClick={handleClickOutSide}
-          className={style.registerModalBg}
-        >
+        <div ref={modalBg} onClick={handleClickOutSide} className={style.registerModalBg}>
           <div className={style.registerModalContent}>
             <div>
               <h1 className={style.modalTitleMessage}>
                 Agora vamos cadastrar um responsável para o <span>FULANO.</span>
               </h1>
             </div>
+            <form>
+              <InputFieldComponent
+                idInput="name"
+                inputLabel="Nome"
+                inputType="text"
+                inputValue={responsibleName}
+                setInputValue={(event) => setResponsibleName(event)}
+              />
+              <InputFieldComponent
+                idInput="name"
+                inputLabel="Nome"
+                inputType="text"
+                inputValue={responsibleName}
+                setInputValue={(event) => setResponsibleName(event)}
+              />
+              <InputFieldComponent
+                idInput="name"
+                inputLabel="Nome"
+                inputType="text"
+                inputValue={responsibleName}
+                setInputValue={(event) => setResponsibleName(event)}
+              />{' '}
+              <InputFieldComponent
+                idInput="name"
+                inputLabel="Nome"
+                inputType="text"
+                inputValue={responsibleName}
+                setInputValue={(event) => setResponsibleName(event)}
+              />
+            </form>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
 export enum PERIOD {
-  TARDE = "AFTERNOON",
-  MANHA = "MORNING",
+  TARDE = 'AFTERNOON',
+  MANHA = 'MORNING',
 }
