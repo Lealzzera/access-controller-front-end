@@ -60,6 +60,7 @@ export default function ModalRegisterResponsibleComponent() {
             <form className={style.registerForm}>
               <InputFieldComponent
                 idInput="name"
+                required
                 inputLabel="Nome"
                 inputType="text"
                 inputValue={responsibleName}
@@ -67,6 +68,7 @@ export default function ModalRegisterResponsibleComponent() {
               />
               <InputFieldComponent
                 idInput="cpf"
+                required
                 inputLabel="CPF"
                 inputType="text"
                 inputValue={responsibleCpf}
@@ -75,12 +77,14 @@ export default function ModalRegisterResponsibleComponent() {
               <InputFieldComponent
                 idInput="zipcode"
                 inputLabel="CEP"
+                required
                 inputType="text"
                 inputValue={postalCode}
                 setInputValue={(event) => setPostalCode(event)}
               />
               <InputFieldComponent
                 idInput="street"
+                required
                 inputLabel="Rua"
                 inputType="text"
                 inputValue={street}
@@ -89,6 +93,7 @@ export default function ModalRegisterResponsibleComponent() {
               <InputFieldComponent
                 idInput="neighborhood"
                 inputLabel="Bairro"
+                required
                 inputType="text"
                 inputValue={neighborhood}
                 setInputValue={(event) => setNeighborhood(event)}
@@ -102,6 +107,7 @@ export default function ModalRegisterResponsibleComponent() {
               />
               <InputFieldComponent
                 idInput="state"
+                required
                 inputLabel="Estado"
                 inputType="text"
                 inputValue={state}
@@ -109,6 +115,7 @@ export default function ModalRegisterResponsibleComponent() {
               />
               <InputFieldComponent
                 idInput="email"
+                required
                 inputLabel="Email"
                 inputType="email"
                 inputValue={email}
@@ -116,6 +123,7 @@ export default function ModalRegisterResponsibleComponent() {
               />
               <InputFieldComponent
                 idInput="password"
+                required
                 inputLabel="Senha"
                 inputType="password"
                 inputValue={password}
@@ -123,6 +131,7 @@ export default function ModalRegisterResponsibleComponent() {
               />
               <InputFieldComponent
                 idInput="confirmPassword"
+                required
                 inputLabel="Confirmar senha"
                 inputType="password"
                 inputValue={confirmPassword}
