@@ -22,10 +22,12 @@
 
 .modalContentWrapped::-webkit-scrollbar {
   width: 10px;
+  display: none;
 }
 
 .modalContentWrapped::-webkit-scrollbar-thumb {
   width: 5px;
+  display: none;
 }
 
 .closeButtonContainer {

@@ -31,7 +31,16 @@
   height: 80vh;
   border-radius: 8px;
   overflow: auto;
-  padding: 1rem;
+}
+
+.registerModalContent::-webkit-scrollbar {
+  width: 10px;
+  display: none;
+}
+
+.registerModalContent::-webkit-scrollbar-thumb {
+  width: 5px;
+  display: none;
 }
 
 .registerInformationText {
@@ -40,6 +49,7 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .modalTitle {
