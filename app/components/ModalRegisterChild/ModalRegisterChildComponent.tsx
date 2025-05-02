@@ -23,7 +23,7 @@ import postPictureToS3 from "@/app/actions/postPictureToS3";
 import { CircularProgress } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 
-export default function ModalRegisterComponent() {
+export default function ModalRegisterChildComponent() {
   const { registerModalOpen, setRegisterModalOpen, userInfo } = useUser();
 
   const [name, setName] = useState("");

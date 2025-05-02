@@ -1,11 +1,11 @@
 import HomePage from "@/app/components/HomePage/HomePage";
-import ModalRegisterComponent from "@/app/components/ModalRegister/ModalRegisterComponent";
+import ModalRegisterChildComponent from "@/app/components/ModalRegisterChild/ModalRegisterChildComponent";
 
 export default function Home() {
   return (
     <div>
       <HomePage />
-      <ModalRegisterComponent />
+      <ModalRegisterChildComponent />
     </div>
   );
 }
