@@ -18,20 +18,28 @@ export default function CardInfoComponent({
   grade,
   pictureUrl,
 }: CardInfoComponentProps) {
-  const [imageSrc, setImageSrc] = useState<StaticImageData | string>(pictureUrl);
-
   return (
     <div className={style.cardContainer}>
       <div className={style.imageContainer}>
-        <Image
-          src={imageSrc}
-          width={300}
-          height={300}
-          alt={name}
-          className={style.imgContent}
-          priority
-          onError={() => setImageSrc(imageError)}
-        />
+        {pictureUrl ? (
+          <Image
+            src={pictureUrl}
+            width={300}
+            height={300}
+            alt={name}
+            className={style.imgContent}
+            priority
+          />
+        ) : (
+          <Image
+            src={imageError}
+            width={300}
+            height={300}
+            alt={name}
+            className={style.imgContent}
+            priority
+          />
+        )}
       </div>
       <div className={style.infoContainer}>
         <p>
