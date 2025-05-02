@@ -12,6 +12,19 @@
   overflow: auto;
 }
 
+.closeModalIcon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.closeIcon {
+  cursor: pointer;
+  margin-top: 0.75rem;
+  margin-right: 0.75rem;
+  color: var(--blue-400);
+}
+
 .registerModalContent {
   width: 300px;
   background-color: var(--gray-100);
@@ -21,13 +34,109 @@
   padding: 1rem;
 }
 
-.modalTitleMessage {
-  font-size: 1rem;
-  text-align: center;
-  font-weight: 400;
-  color: var(--gray-600);
+.registerInformationText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
 
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--gray-600);
+}
+
+.modalDescription {
+  text-align: center;
+  font-size: 1rem;
   & span {
     font-weight: bold;
+  }
+}
+
+.registerForm {
+  min-height: calc(100% - 162px);
+  padding: 0 20px;
+  margin-top: 2rem;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.noPicture {
+  display: flex;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.imageSelected {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.containerButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.containerButtons div {
+  width: 100px;
+}
+
+.containerFileButton {
+  display: 'flex';
+  align-items: 'center';
+  justify-content: 'center';
+  flex-direction: column;
+}
+
+.chooseFileLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--blue-400);
+  font-size: 14px;
+  border: 2px solid var(--blue-400);
+  cursor: pointer;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.chooseFileButton {
+  width: 0px;
+  display: none;
+}
+
+.registerButtonContainer {
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 760px) {
+  .registerModalContent {
+    width: 500px;
+  }
+
+  .registerInformationText {
+    padding: 0 70px;
+  }
+
+  .registerForm {
+    padding: 0 50px;
+  }
+
+  .imageSelected {
+    height: auto;
+  }
+
+  .containerButtons div {
+    width: 180px;
   }
 }
