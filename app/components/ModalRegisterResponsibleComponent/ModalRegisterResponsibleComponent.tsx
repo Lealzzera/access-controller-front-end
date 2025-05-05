@@ -100,6 +100,7 @@ export default function ModalRegisterResponsibleComponent() {
               />
               <InputFieldComponent
                 idInput="city"
+                required
                 inputLabel="Cidade"
                 inputType="text"
                 inputValue={city}
