@@ -44,7 +44,7 @@ export default function ModalRegisterChildComponent() {
   const modalContainer = useRef(null);
 
   const handleCloseModalClickingOutside = (event: any) => {
-    if (event.target === modalContainer.current) {
+    if (event.target === modalContainer.current && !loadRegisterData) {
       handleCloseModal();
     }
   };
@@ -65,6 +65,7 @@ export default function ModalRegisterChildComponent() {
   };
 
   const handleCloseModal = () => {
+    if (loadRegisterData) return;
     setRegisterModalOpen(false);
     stream?.getTracks().forEach((track) => {
       track.stop();
