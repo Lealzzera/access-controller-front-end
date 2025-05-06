@@ -69,7 +69,6 @@ export default function ModalRegisterResponsibleComponent() {
         return {...item, name: KINSHIP[item.name as keyof typeof KINSHIP]}
       })
 
-      console.log(kinshipFormatted)
       setKinshipList(kinshipFormatted)
     }
     fetchKinshipList() 
