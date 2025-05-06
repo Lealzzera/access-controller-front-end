@@ -2,7 +2,7 @@
 
 import { useUser } from '@/app/context/userContext';
 import style from './style.module.css';
-import { SyntheticEvent, useRef, useState } from 'react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import InputFieldComponent from '../InputFieldComponent/InputFieldComponent';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import { CircularProgress } from '@mui/material';
@@ -15,6 +15,7 @@ export default function ModalRegisterResponsibleComponent() {
     registerResponsibleModalOpen,
     setRegisterResponsibleModalOpen,
     lastChildRegisteredInformation,
+    setLastChildRegisteredInformation
   } = useUser();
 
   const [loadRegisterData, setLoadRegisterData] = useState(false);
@@ -37,8 +38,19 @@ export default function ModalRegisterResponsibleComponent() {
 
   const handleClickOutSide = (event: SyntheticEvent) => {
     if (event.target !== modalBg.current) return;
-    setRegisterResponsibleModalOpen(false);
+    handleCloseModal()
   };
+
+  const handleCloseModal = () => {
+    setRegisterResponsibleModalOpen(false);
+    setLastChildRegisteredInformation(undefined)
+  }
+
+  useEffect(() => {
+    if(lastChildRegisteredInformation) {
+      setRegisterResponsibleModalOpen(true)
+    }
+  }, [lastChildRegisteredInformation])
 
   return (
     <>
@@ -46,7 +58,7 @@ export default function ModalRegisterResponsibleComponent() {
         <div ref={modalBg} onClick={handleClickOutSide} className={style.registerModalBg}>
           <div className={style.registerModalContent}>
             <div className={style.closeModalIcon}>
-              <CloseRoundedIcon fontSize="large" className={style.closeIcon} />
+              <CloseRoundedIcon onClick={handleCloseModal} fontSize="large" className={style.closeIcon} />
             </div>
             <div className={style.registerInformationText}>
               <h1 className={style.modalTitle}>Cadastrar responsável</h1>

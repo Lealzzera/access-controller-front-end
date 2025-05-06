@@ -24,7 +24,7 @@ import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function ModalRegisterChildComponent() {
-  const { registerModalOpen, setRegisterModalOpen, userInfo } = useUser();
+  const { registerModalOpen, setRegisterModalOpen, userInfo, setLastChildRegisteredInformation } = useUser();
 
   const [name, setName] = useState('');
   const [cpf, setCpf] = useState('');
@@ -102,6 +102,12 @@ export default function ModalRegisterChildComponent() {
         picture: pictureUrl,
       });
     }
+
+    setLastChildRegisteredInformation({
+      cpf,
+      id: responseRegister.child.id,
+      name
+    })
     setLoadRegisterData(false);
     notifySuccess();
     handleCloseModal();

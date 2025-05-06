@@ -28,7 +28,7 @@ type UserContextType = {
   registerResponsibleModalOpen: boolean;
   setRegisterResponsibleModalOpen: (value: boolean) => void;
   lastChildRegisteredInformation: LastChildRegisteredInformationType | undefined;
-  setLastChildRegisteredInformation: (value: LastChildRegisteredInformationType) => void;
+  setLastChildRegisteredInformation: (value: LastChildRegisteredInformationType | undefined) => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
