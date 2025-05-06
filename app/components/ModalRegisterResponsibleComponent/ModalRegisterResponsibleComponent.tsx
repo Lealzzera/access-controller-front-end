@@ -9,6 +9,15 @@ import { CircularProgress } from '@mui/material';
 import NoPhotographyRoundedIcon from '@mui/icons-material/NoPhotographyRounded';
 import Image from 'next/image';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { getKinshipList } from '@/app/actions/getKinshipList';
+import SelectComponent from '../SelectComponent/SelectComponent';
+import { KINSHIP } from '@/app/enums/Kinship.enum';
+
+type KinshipType = {
+  id: string
+  value: number
+  name: string
+}
 
 export default function ModalRegisterResponsibleComponent() {
   const {
@@ -33,6 +42,7 @@ export default function ModalRegisterResponsibleComponent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [kinshipList, setKinshipList] = useState([])
 
   const modalBg = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +61,19 @@ export default function ModalRegisterResponsibleComponent() {
       setRegisterResponsibleModalOpen(true)
     }
   }, [lastChildRegisteredInformation])
+
+  useEffect(() => {
+    const fetchKinshipList = async() => {
+      const response = await getKinshipList()
+      const kinshipFormatted = response.map((item: KinshipType) => {
+        return {...item, name: KINSHIP[item.name as keyof typeof KINSHIP]}
+      })
+
+      console.log(kinshipFormatted)
+      setKinshipList(kinshipFormatted)
+    }
+    fetchKinshipList() 
+  }, [])
 
   return (
     <>
@@ -86,46 +109,7 @@ export default function ModalRegisterResponsibleComponent() {
                 inputValue={responsibleCpf}
                 setInputValue={(event) => setResponsibleCpf(event)}
               />
-              <InputFieldComponent
-                idInput="zipcode"
-                inputLabel="CEP"
-                required
-                inputType="text"
-                inputValue={postalCode}
-                setInputValue={(event) => setPostalCode(event)}
-              />
-              <InputFieldComponent
-                idInput="street"
-                required
-                inputLabel="Rua"
-                inputType="text"
-                inputValue={street}
-                setInputValue={(event) => setStreet(event)}
-              />
-              <InputFieldComponent
-                idInput="neighborhood"
-                inputLabel="Bairro"
-                required
-                inputType="text"
-                inputValue={neighborhood}
-                setInputValue={(event) => setNeighborhood(event)}
-              />
-              <InputFieldComponent
-                idInput="city"
-                required
-                inputLabel="Cidade"
-                inputType="text"
-                inputValue={city}
-                setInputValue={(event) => setCity(event)}
-              />
-              <InputFieldComponent
-                idInput="state"
-                required
-                inputLabel="Estado"
-                inputType="text"
-                inputValue={state}
-                setInputValue={(event) => setState(event)}
-              />
+              <SelectComponent disabled={false} labelText='Selecione o grau de parentesco' selectId='kinship' setSelectValue={setKinship} selectName='kinship' selectLabel='Grau de parentesco' selectOptions={kinshipList} required />
               <InputFieldComponent
                 idInput="email"
                 required
