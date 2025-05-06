@@ -82,7 +82,7 @@ export default function HomePage() {
     if (userInfo && hasMore && !loading && !registerModalOpen) {
       getChildrenListByUserId(currentPage);
     }
-  }, [userInfo, currentPage, hasMore, registerModalOpen]);
+  }, [userInfo, currentPage, hasMore]);
 
   return (
     <>

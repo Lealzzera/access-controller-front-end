@@ -50,6 +50,10 @@
   width: 65%;
 }
 
+.infoContainer p {
+  text-transform: capitalize;
+}
+
 @media (min-width: 760px) {
   .imageContainer {
     width: 100px;
