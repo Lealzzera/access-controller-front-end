@@ -79,10 +79,14 @@ export default function HomePage() {
   }, [registerModalOpen]);
 
   useEffect(() => {
+    console.log(childrenData)
+  }, [childrenData])
+
+  useEffect(() => {
     if (userInfo && hasMore && !loading && !registerModalOpen) {
       getChildrenListByUserId(currentPage);
     }
-  }, [userInfo, currentPage, hasMore]);
+  }, [userInfo, currentPage, hasMore, registerModalOpen]);
 
   return (
     <>
@@ -111,7 +115,7 @@ export default function HomePage() {
             </div>
           </div>
         )}
-        {childrenData.map((child, index) => {
+        {childrenData.length > 0 && childrenData.map((child, index) => {
           const isLastCard = index === childrenData.length - 1;
           return (
             <div
