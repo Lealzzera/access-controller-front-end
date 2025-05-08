@@ -22,9 +22,11 @@ import { updateChild } from '@/app/actions/updateChild';
 import postPictureToS3 from '@/app/actions/postPictureToS3';
 import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
+import { handleStartCamera } from '@/app/helpers/handleStartCamera';
 
 export default function ModalRegisterChildComponent() {
-  const { registerModalOpen, setRegisterModalOpen, userInfo, setLastChildRegisteredInformation } = useUser();
+  const { registerModalOpen, setRegisterModalOpen, userInfo, setLastChildRegisteredInformation } =
+    useUser();
 
   const [name, setName] = useState('');
   const [cpf, setCpf] = useState('');
@@ -106,31 +108,11 @@ export default function ModalRegisterChildComponent() {
     setLastChildRegisteredInformation({
       cpf,
       id: responseRegister.child.id,
-      name
-    })
+      name,
+    });
     setLoadRegisterData(false);
     notifySuccess();
     handleCloseModal();
-  };
-  const handleStartCamera = async () => {
-    try {
-      setLoadCameraData(true);
-      const streamNavigator = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      setStream(streamNavigator);
-      if (streamNavigator.active) {
-        setLoadCameraData(false);
-      }
-      const videoElement = document.getElementById('camera') as HTMLVideoElement;
-      if (videoElement) {
-        videoElement.srcObject = streamNavigator;
-        videoElement.play();
-      }
-    } catch (err) {
-      setLoadCameraData(false);
-      console.error("Error accessing user's camera: ", err);
-    }
   };
 
   const openModalCamera = () => {
@@ -187,7 +169,11 @@ export default function ModalRegisterChildComponent() {
 
   useEffect(() => {
     if (isCameraModalOpen) {
-      handleStartCamera();
+      const handleCamera = async () => {
+        await handleStartCamera({ setLoadCameraData, setStream });
+      };
+
+      handleCamera();
     }
   }, [isCameraModalOpen]);
 
