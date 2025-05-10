@@ -38,7 +38,7 @@ export default function HomePage() {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage((prev) => prev + 1);
+          setCurrentPage(currentPage + 1);
         }
       });
 
@@ -64,7 +64,12 @@ export default function HomePage() {
         return;
       }
 
-      setChildrenData((prev) => [...prev, ...response]);
+      setChildrenData((prev) => {
+        const existingIds = new Set(prev.map((child) => child.id))
+        const newItems = response.filter((child: ChildrenDataType) => !existingIds.has(child.id))
+  
+        return [...prev, ...newItems]
+      });
       setLoading(false);
     },
     [userInfo]
@@ -77,10 +82,6 @@ export default function HomePage() {
       setHasMore(true);
     }
   }, [registerModalOpen]);
-
-  useEffect(() => {
-    console.log(childrenData)
-  }, [childrenData])
 
   useEffect(() => {
     if (userInfo && hasMore && !loading && !registerModalOpen) {
