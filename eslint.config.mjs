@@ -10,12 +10,16 @@ export default defineConfig([
     plugins: {
       js,
     },
-    extends: ['js/recommended'],
+    extends: ['js/recommended', 'react-app'],
   },
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: {
       globals: globals.browser,
+    },
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
     },
   },
   tseslint.configs.recommended,

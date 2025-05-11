@@ -14,6 +14,8 @@ import SelectComponent from '../SelectComponent/SelectComponent';
 import { KINSHIP } from '@/app/enums/Kinship.enum';
 import ModalCameraComponent from '../ModalCameraComponent/ModalCameraComponent';
 import { handleStartCamera } from '@/app/helpers/handleStartCamera';
+import maskCpfFunction from '@/app/helpers/maskCpfFunction';
+import { registerResponsible } from '@/app/actions/registerResponsible';
 
 type KinshipType = {
   id: string;
@@ -39,11 +41,6 @@ export default function ModalRegisterResponsibleComponent() {
 
   const [responsibleName, setResponsibleName] = useState('');
   const [responsibleCpf, setResponsibleCpf] = useState('');
-  const [street, setStreet] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [postalCode, setPostalCode] = useState('');
   const [kinship, setKinship] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,6 +54,20 @@ export default function ModalRegisterResponsibleComponent() {
     handleCloseModal();
   };
 
+  const handleRegister = async (event: any) => {
+    event.preventDefault();
+    const response = await registerResponsible({
+      institutionId: '10',
+      childId: '10',
+      cpf: responsibleCpf,
+      email,
+      kinshipId: kinship,
+      name: responsibleName,
+      password,
+    });
+    console.log(response);
+  };
+
   const handleCloseModal = () => {
     setRegisterResponsibleModalOpen(false);
     setLastChildRegisteredInformation(undefined);
@@ -67,6 +78,11 @@ export default function ModalRegisterResponsibleComponent() {
       setImagePreviewerData(undefined);
     }
     setCameraModalOpen(true);
+  };
+
+  const handleChangeCPF = (value: string) => {
+    const cpfNumber = maskCpfFunction(value);
+    setResponsibleCpf(cpfNumber);
   };
 
   useEffect(() => {
@@ -119,7 +135,7 @@ export default function ModalRegisterResponsibleComponent() {
                   </span>
                 </p>
               </div>
-              <form className={style.registerForm}>
+              <form className={style.registerForm} onSubmit={handleRegister}>
                 <InputFieldComponent
                   idInput="name"
                   required
@@ -134,7 +150,7 @@ export default function ModalRegisterResponsibleComponent() {
                   inputLabel="CPF"
                   inputType="text"
                   inputValue={responsibleCpf}
-                  setInputValue={(event) => setResponsibleCpf(event)}
+                  setInputValue={handleChangeCPF}
                 />
                 <SelectComponent
                   disabled={false}
@@ -207,9 +223,7 @@ export default function ModalRegisterResponsibleComponent() {
                     fontSize: '10px',
                     visibility: fileName.length ? 'initial' : 'hidden',
                   }}
-                >
-                  'nothing'
-                </p>
+                ></p>
                 <div className={style.containerButtons}>
                   <div className={style.containerFileButton}>
                     <label className={style.chooseFileLabel} htmlFor="inputFile">
