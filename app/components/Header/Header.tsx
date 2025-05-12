@@ -11,7 +11,7 @@ import React from 'react';
 
 export default function Header() {
   const router = useRouter();
-  const { userInfo, setRegisterModalOpen, setRegisterResponsibleModalOpen } = useUser();
+  const { userInfo, setRegisterModalOpen } = useUser();
   const [userName, setUserName] = useState<string | undefined>('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -36,13 +36,6 @@ export default function Header() {
     setRegisterModalOpen(true);
   };
 
-  //TODO: REMOVE THIS METHOD IN THE FUTURE CAUSE THE LOGIC TO REGISTER A RESPONSIBLE HAS BEEN CHANGED
-
-  const handleOpenRegisterResponsibleModal = () => {
-    handleCloseMenu();
-    setRegisterResponsibleModalOpen(true);
-  };
-
   useEffect(() => {
     setUserName(userInfo?.userInfo.name);
   }, [userInfo]);
@@ -57,11 +50,6 @@ export default function Header() {
             </button>
             <Menu onClose={handleCloseMenu} id="basic-menu" open={open} anchorEl={anchorEl}>
               <MenuItem onClick={handleRegisterChildFunction}>Cadastrar Criança</MenuItem>
-              {/* TODO: REMOVE THIS MENUITEM BUTTON IN THE FUTURE CAUSE 
-              THE LOGIC TO REGISTER A RESPONSIBLE HAS BEEN CHANGED */}
-              <MenuItem onClick={handleOpenRegisterResponsibleModal}>
-                Cadastrar Responsável
-              </MenuItem>
               <MenuItem onClick={logoutFunction}>Sair</MenuItem>
             </Menu>
           </div>

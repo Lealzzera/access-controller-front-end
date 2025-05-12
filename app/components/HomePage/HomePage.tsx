@@ -12,6 +12,7 @@ import ButtonComponent from '../ButtonComponent/ButtonComponent';
 type ChildrenDataType = {
   id: string;
   name: string;
+  cpf: string;
   period: {
     id: string;
     name: string;
@@ -24,12 +25,23 @@ type ChildrenDataType = {
 };
 
 export default function HomePage() {
-  const { userInfo, registerModalOpen, setRegisterModalOpen } = useUser();
+  const {
+    userInfo,
+    registerModalOpen,
+    setRegisterModalOpen,
+    setRegisterResponsibleModalOpen,
+    setLastChildRegisteredInformation,
+  } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const observer = useRef<IntersectionObserver | null>(null);
+
+  const handleOpenCard = (cardInfo: ChildrenDataType) => {
+    setLastChildRegisteredInformation({ id: cardInfo.id, cpf: cardInfo.cpf, name: cardInfo.name });
+    setRegisterResponsibleModalOpen(true);
+  };
 
   const lastCardRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -65,10 +77,10 @@ export default function HomePage() {
       }
 
       setChildrenData((prev) => {
-        const existingIds = new Set(prev.map((child) => child.id))
-        const newItems = response.filter((child: ChildrenDataType) => !existingIds.has(child.id))
-  
-        return [...prev, ...newItems]
+        const existingIds = new Set(prev.map((child) => child.id));
+        const newItems = response.filter((child: ChildrenDataType) => !existingIds.has(child.id));
+
+        return [...prev, ...newItems];
       });
       setLoading(false);
     },
@@ -116,23 +128,25 @@ export default function HomePage() {
             </div>
           </div>
         )}
-        {childrenData.length > 0 && childrenData.map((child, index) => {
-          const isLastCard = index === childrenData.length - 1;
-          return (
-            <div
-              key={child.id}
-              className={style.containerCard}
-              ref={isLastCard ? lastCardRef : null}
-            >
-              <CardInfoComponent
-                name={child.name}
-                period={child.period.name}
-                grade={child.grade.name}
-                pictureUrl={child.picture}
-              />
-            </div>
-          );
-        })}
+        {childrenData.length > 0 &&
+          childrenData.map((child, index) => {
+            const isLastCard = index === childrenData.length - 1;
+            return (
+              <div
+                key={child.id}
+                className={style.containerCard}
+                ref={isLastCard ? lastCardRef : null}
+              >
+                <CardInfoComponent
+                  onClickCard={() => handleOpenCard(child)}
+                  name={child.name}
+                  period={child.period.name}
+                  grade={child.grade.name}
+                  pictureUrl={child.picture}
+                />
+              </div>
+            );
+          })}
         {loading && childrenData.length > 0 && (
           <div className={style.circularProgressContainer}>
             <CircularProgress className={style.circularProgress} />

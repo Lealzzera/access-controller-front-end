@@ -1,8 +1,7 @@
 'use client';
 
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import style from './style.module.css';
-import { useState } from 'react';
 import imageError from '@/app/assets/error-image.png';
 
 type CardInfoComponentProps = {
@@ -10,6 +9,7 @@ type CardInfoComponentProps = {
   period: string;
   grade: string;
   pictureUrl: string;
+  onClickCard: (value: any) => void;
 };
 
 export default function CardInfoComponent({
@@ -17,9 +17,10 @@ export default function CardInfoComponent({
   period,
   grade,
   pictureUrl,
+  onClickCard,
 }: CardInfoComponentProps) {
   return (
-    <div className={style.cardContainer}>
+    <div className={style.cardContainer} onClick={onClickCard}>
       <div className={style.imageContainer}>
         {pictureUrl ? (
           <Image
