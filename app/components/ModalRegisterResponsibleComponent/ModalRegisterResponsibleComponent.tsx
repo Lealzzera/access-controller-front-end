@@ -16,6 +16,13 @@ import ModalCameraComponent from '../ModalCameraComponent/ModalCameraComponent';
 import { handleStartCamera } from '@/app/helpers/handleStartCamera';
 import maskCpfFunction from '@/app/helpers/maskCpfFunction';
 import { registerResponsible } from '@/app/actions/registerResponsible';
+import { ErrorMessagesEnum } from '@/app/enums/ErrorMessages.enum';
+import { getPreSignedUploadURL } from '@/app/actions/getPreSignedUploadURL';
+import compressFile from '@/app/helpers/compressFile';
+import postPictureToS3 from '@/app/actions/postPictureToS3';
+import { updateResponsible } from '@/app/actions/updateResponsible';
+import { toast, ToastContainer } from 'react-toastify';
+import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
 
 type KinshipType = {
   id: string;
@@ -29,6 +36,7 @@ export default function ModalRegisterResponsibleComponent() {
     setRegisterResponsibleModalOpen,
     lastChildRegisteredInformation,
     setLastChildRegisteredInformation,
+    userInfo,
   } = useUser();
 
   const [loadRegisterData, setLoadRegisterData] = useState(false);
@@ -54,21 +62,108 @@ export default function ModalRegisterResponsibleComponent() {
     handleCloseModal();
   };
 
+  const errorMap: Record<string, string> = {
+    [ErrorMessagesEnum.PASSWORD_ERROR]:
+      'A senha deve conter 6 caracteres com ao menos 1 número, 1 letra maiúscula e 1 caractere especial.',
+    [ErrorMessagesEnum.EMAIL_FROM_INSTITUTION]: 'Email cadastrado como uma instituição.',
+    [ErrorMessagesEnum.CPF_FROM_A_CHILD]:
+      'O CPF fornecido está cadastrado como CPF de uma criança.',
+    [ErrorMessagesEnum.CHILD_ID_NOT_FOUND]: 'ChildId fornecido não existe.',
+    [ErrorMessagesEnum.RESPONSIBLE_ALREADY_LINKED_TO_CHILD]:
+      'Este responsável já está linkado a essa criança.',
+    [ErrorMessagesEnum.EMAIL_FROM_OTHER_USER]: 'Email fornecido já existe em nossa base de dados.',
+    [ErrorMessagesEnum.CPF_FROM_OTHER_USER]: 'CPF fornecido já existe em nossa base de dados.',
+  };
+
   const handleRegister = async (event: any) => {
+    setLoadRegisterData(true);
     event.preventDefault();
+    if (!userInfo || !lastChildRegisteredInformation || !fileData) return;
+
+    if (password !== confirmPassword) {
+      notifyError('As senhas digitadas não conferem.');
+      setLoadRegisterData(false);
+      return;
+    }
+    const cleanCpf = cleanCpfNumber(responsibleCpf);
+
     const response = await registerResponsible({
-      institutionId: '10',
-      childId: '10',
-      cpf: responsibleCpf,
+      institutionId: userInfo?.id,
+      childId: lastChildRegisteredInformation?.id,
+      cpf: cleanCpf,
       email,
       kinshipId: kinship,
       name: responsibleName,
       password,
     });
-    console.log(response);
+
+    const messageError = Array.isArray(response.message) ? response.message[0] : response.message;
+    const friendlyMessage = errorMap[messageError];
+
+    if (friendlyMessage) {
+      notifyError(friendlyMessage);
+      setLoadRegisterData(false);
+      return;
+    }
+
+    const s3URL = await getPreSignedUploadURL(
+      response.responsible.id,
+      fileData?.type,
+      'responsible'
+    );
+    const url = new URL(s3URL);
+    const pictureUrl = `${url.origin}${url.pathname}`;
+    const responsePicture = await postPictureToS3(s3URL, fileData);
+
+    if (responsePicture.status === 200) {
+      await updateResponsible({
+        id: response.responsible.id,
+        picture: pictureUrl,
+      });
+    }
+    setLoadRegisterData(false);
+    notifySuccess();
+    handleCloseModal();
+  };
+
+  const notifySuccess = () =>
+    toast.success('Responsável cadastrado com sucesso!', {
+      autoClose: 5000,
+      theme: 'colored',
+      pauseOnHover: false,
+      closeOnClick: true,
+      hideProgressBar: true,
+      containerId: 'success-container',
+    });
+
+  const notifyError = (message?: string) =>
+    toast.error(`Erro ao cadastrar responsável! ${message}`, {
+      autoClose: 5000,
+      theme: 'colored',
+      pauseOnHover: false,
+      closeOnClick: true,
+      hideProgressBar: true,
+      containerId: 'error-container',
+    });
+
+  const resetAllStatus = () => {
+    setResponsibleName('');
+    setResponsibleCpf('');
+    setCameraModalOpen(false);
+    setImagePreviewerData(undefined);
+    setFileName('');
+    setFileData(null);
+    setLoadCameraData(false);
+    setStream(undefined);
+    setLoadRegisterData(false);
+    setKinship('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
   };
 
   const handleCloseModal = () => {
+    resetAllStatus();
     setRegisterResponsibleModalOpen(false);
     setLastChildRegisteredInformation(undefined);
   };
@@ -83,6 +178,17 @@ export default function ModalRegisterResponsibleComponent() {
   const handleChangeCPF = (value: string) => {
     const cpfNumber = maskCpfFunction(value);
     setResponsibleCpf(cpfNumber);
+  };
+
+  const handleChangeImage = async (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      const fileCompressed = await compressFile(file);
+      setFileData(fileCompressed);
+      const url = URL.createObjectURL(file);
+      setFileName(file.name);
+      setImagePreviewerData(url);
+    }
   };
 
   useEffect(() => {
@@ -115,6 +221,7 @@ export default function ModalRegisterResponsibleComponent() {
 
   return (
     <>
+      <ToastContainer containerId="success-container" />
       {registerResponsibleModalOpen && (
         <div ref={modalBg} onClick={handleClickOutSide} className={style.registerModalBg}>
           {!cameraModalOpen ? (
@@ -126,6 +233,7 @@ export default function ModalRegisterResponsibleComponent() {
                   className={style.closeIcon}
                 />
               </div>
+              <ToastContainer containerId="error-container" />
               <div className={style.registerInformationText}>
                 <h1 className={style.modalTitle}>Cadastrar responsável</h1>
                 <p className={style.modalDescription}>
@@ -233,6 +341,7 @@ export default function ModalRegisterResponsibleComponent() {
                       id="inputFile"
                       accept="image/jpeg, image/jpg, image/png, image/webp"
                       size={60}
+                      onChange={handleChangeImage}
                       className={style.chooseFileButton}
                       type="file"
                     />
@@ -253,6 +362,15 @@ export default function ModalRegisterResponsibleComponent() {
                 </div>
                 <div className={style.registerButtonContainer}>
                   <ButtonComponent
+                    disabled={
+                      !responsibleName.length ||
+                      responsibleCpf.length < 14 ||
+                      !kinship.length ||
+                      !email.length ||
+                      !password.length ||
+                      !confirmPassword.length ||
+                      !imagePreviewerData?.length
+                    }
                     style={{
                       fontSize: '1rem',
                       textTransform: 'none',

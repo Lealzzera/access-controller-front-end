@@ -23,6 +23,7 @@ import postPictureToS3 from '@/app/actions/postPictureToS3';
 import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import { handleStartCamera } from '@/app/helpers/handleStartCamera';
+import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
 
 export default function ModalRegisterChildComponent() {
   const { registerModalOpen, setRegisterModalOpen, userInfo, setLastChildRegisteredInformation } =
@@ -80,12 +81,13 @@ export default function ModalRegisterChildComponent() {
     if (!userInfo || !fileData) return;
     setLoadRegisterData(true);
     const parsedDate = parseDateWithDateFns(birthDate);
+    const cleanCpf = cleanCpfNumber(cpf);
     const responseRegister = await registerChild({
       name,
       birthDate: parsedDate,
       periodId: period,
       gradeId: grade,
-      cpf,
+      cpf: cleanCpf,
       institutionId: userInfo.id,
     });
 
@@ -94,7 +96,11 @@ export default function ModalRegisterChildComponent() {
       setLoadRegisterData(false);
     }
 
-    const presignedUrl = await getPreSignedUploadURL(responseRegister.child.id, fileData?.type);
+    const presignedUrl = await getPreSignedUploadURL(
+      responseRegister.child.id,
+      fileData?.type,
+      'child'
+    );
     const url = new URL(presignedUrl);
     const pictureUrl = `${url.origin}${url.pathname}`;
     const response = await postPictureToS3(presignedUrl, fileData);
