@@ -13,18 +13,23 @@ interface RegisterResponsibleData {
 }
 
 export async function registerResponsible({
-  institutionId, childId, name, email, password, cpf, kinshipId}: RegisterResponsibleData) {
+  institutionId,
+  childId,
+  name,
+  email,
+  password,
+  cpf,
+  kinshipId,
+}: RegisterResponsibleData) {
   try {
-    const body = JSON.stringify({institutionId, childId, name, email, password, cpf, kinshipId});
+    const body = JSON.stringify({ institutionId, childId, name, email, password, cpf, kinshipId });
 
     const response = await apiClient({
       path: '/responsible/register',
       method: 'POST',
       body,
     });
-
     const data = await response.json();
-
     return data;
   } catch (error: unknown) {
     console.error('Error to register:', error);
