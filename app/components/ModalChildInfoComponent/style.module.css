@@ -1,0 +1,33 @@
+.modalBg {
+  background-color: rgba(0, 0, 0, 0.7);
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  z-index: 99999;
+  overflow: auto;
+}
+
+.modalBody {
+  width: 300px;
+  background-color: var(--gray-100);
+  height: 80vh;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+@media (min-width: 760px) {
+  .modalBody {
+    width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modalBody {
+    width: 800px;
+  }
+}

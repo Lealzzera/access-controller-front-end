@@ -8,6 +8,7 @@ import { getChildrenList } from '@/app/actions/getChildrenList';
 import { CircularProgress } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
+import ModalChildInfoComponent from '../ModalChildInfoComponent/ModalChildInfoComponent';
 
 type ChildrenDataType = {
   id: string;
@@ -36,11 +37,12 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
+  const [modalChildInfo, setModalChildInfo] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleOpenCard = (cardInfo: ChildrenDataType) => {
-    setLastChildRegisteredInformation({ id: cardInfo.id, cpf: cardInfo.cpf, name: cardInfo.name });
-    setRegisterResponsibleModalOpen(true);
+    // setRegisterResponsibleModalOpen(true);
+    setModalChildInfo(true);
   };
 
   const lastCardRef = useCallback(
@@ -103,6 +105,7 @@ export default function HomePage() {
 
   return (
     <>
+      <ModalChildInfoComponent isModalChildInfoOpen={modalChildInfo} />
       {childrenData.length === 0 && loading && (
         <div className={style.container}>
           <Skeleton variant="rounded" className={style.skeletonComponent} />
