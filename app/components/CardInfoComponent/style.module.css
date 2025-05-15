@@ -30,10 +30,32 @@
 }
 
 .active {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.active::before {
   display: block;
+  content: '';
   width: 8px;
   height: 8px;
   background-color: green;
+  border-radius: 50%;
+}
+
+.inactive {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.inactive::before {
+  display: block;
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: red;
   border-radius: 50%;
 }
 

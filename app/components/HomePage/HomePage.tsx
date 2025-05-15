@@ -14,6 +14,7 @@ type ChildrenDataType = {
   id: string;
   name: string;
   cpf: string;
+  isPresent: boolean;
   period: {
     id: string;
     name: string;
@@ -37,12 +38,15 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
-  const [modalChildInfo, setModalChildInfo] = useState(false);
+  const [openModalChildInfo, setOpenModalChildInfo] = useState(false);
+  const [childInfo, setChildInfo] = useState<any>(undefined);
+
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleOpenCard = (cardInfo: ChildrenDataType) => {
     // setRegisterResponsibleModalOpen(true);
-    setModalChildInfo(true);
+    setOpenModalChildInfo(true);
+    setChildInfo(cardInfo);
   };
 
   const lastCardRef = useCallback(
@@ -105,7 +109,11 @@ export default function HomePage() {
 
   return (
     <>
-      <ModalChildInfoComponent isModalChildInfoOpen={modalChildInfo} />
+      <ModalChildInfoComponent
+        isModalChildInfoOpen={openModalChildInfo}
+        setIsModalChildInfoOpen={setOpenModalChildInfo}
+        childInfo={childInfo}
+      />
       {childrenData.length === 0 && loading && (
         <div className={style.container}>
           <Skeleton variant="rounded" className={style.skeletonComponent} />
@@ -141,6 +149,7 @@ export default function HomePage() {
                 ref={isLastCard ? lastCardRef : null}
               >
                 <CardInfoComponent
+                  isPresent={child.isPresent}
                   onClickCard={() => handleOpenCard(child)}
                   name={child.name}
                   period={child.period.name}

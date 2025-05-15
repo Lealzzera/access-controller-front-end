@@ -10,6 +10,7 @@ type CardInfoComponentProps = {
   grade: string;
   pictureUrl: string;
   onClickCard: (value: any) => void;
+  isPresent: boolean;
 };
 
 export default function CardInfoComponent({
@@ -18,6 +19,7 @@ export default function CardInfoComponent({
   grade,
   pictureUrl,
   onClickCard,
+  isPresent,
 }: CardInfoComponentProps) {
   return (
     <div className={style.cardContainer} onClick={onClickCard}>
@@ -57,8 +59,11 @@ export default function CardInfoComponent({
         </p>
         <p className={style.statusContainer}>
           <span className={style.titleInfo}>Status: </span>
-          <span className={style.active}></span>
-          Ativo
+          {isPresent ? (
+            <span className={style.active}>Presente</span>
+          ) : (
+            <span className={style.inactive}>Ausente</span>
+          )}
         </p>
       </div>
     </div>

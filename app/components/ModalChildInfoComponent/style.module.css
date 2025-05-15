@@ -20,6 +20,160 @@
   overflow: auto;
 }
 
+.childName {
+  font-size: 1rem;
+  color: var(--gray-600);
+}
+
+.imgContainer {
+  background-color: black;
+  max-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.childImg {
+  width: 100%;
+  max-height: 250px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.closeButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1rem 0rem 0rem;
+}
+
+.closeIcon {
+  cursor: pointer;
+  color: var(--blue-400);
+}
+
+.containerInfo {
+  margin: 0rem 1rem;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.childStats {
+  color: var(--gray-600);
+  margin-top: 0.5rem;
+  font-size: 14px;
+  & span {
+    font-weight: bold;
+  }
+}
+
+.status {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.active,
+.inactive {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 400;
+}
+
+.active::before {
+  display: block;
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: green;
+  border-radius: 50%;
+}
+
+.inactive::before {
+  display: block;
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.responsibleListContainer {
+  margin: 1rem;
+}
+
+.notFoundResponsibles {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+
+  & p {
+    text-align: center;
+    font-size: 14px;
+  }
+}
+
+.responsiblesContainer {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.responsibleCard {
+  background-color: #fff;
+  border-radius: 8px;
+  height: 400px;
+  box-shadow: 3px 3px 5px 0px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+}
+
+.responsiblePictureContainer {
+  background-color: #fff;
+  display: flex;
+  border-radius: 8px;
+  justify-content: center;
+  padding: 0.5rem;
+  align-items: center;
+}
+
+.responsiblePicture {
+  width: 100%;
+  max-height: 200px;
+  background-color: black;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.responsibleInfo {
+  margin: 0rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  color: var(--gray-600);
+
+  & p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & span {
+    font-weight: bold;
+  }
+}
+
+.responsibleName {
+  font-weight: bold;
+  color: var(--gray-600);
+}
+
 @media (min-width: 760px) {
   .modalBody {
     width: 600px;
