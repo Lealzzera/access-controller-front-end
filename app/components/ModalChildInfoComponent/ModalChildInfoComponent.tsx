@@ -142,6 +142,9 @@ export default function ModalChildInfoComponent({
                               <span>CPF: </span> {responsible.cpf}
                             </p>
                           </div>
+                          <div className={style.infoContainer}>
+                            <ButtonComponent buttonText="Detalhes" />
+                          </div>
                         </li>
                       ))}
                     </ul>
