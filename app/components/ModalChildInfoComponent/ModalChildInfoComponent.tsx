@@ -114,7 +114,9 @@ export default function ModalChildInfoComponent({
                   {childResponsibles.length === 0 && (
                     <div className={style.notFoundResponsibles}>
                       <p>Não existem responsáveis cadastrados.</p>
-                      <ButtonComponent buttonText="Cadastrar" />
+                      <div className={style.registerResponsibleButton}>
+                        <ButtonComponent buttonText="Cadastrar" />
+                      </div>
                     </div>
                   )}
                   {childResponsibles.length > 0 && !loading && (
@@ -130,23 +132,25 @@ export default function ModalChildInfoComponent({
                               alt={responsible.name}
                             />
                           </div>
-                          <div className={style.responsibleInfo}>
-                            <p className={style.responsibleName}>{responsible.name}</p>
-                            <p>
-                              <span>Parentesco: </span> {responsible.kinship}
-                            </p>
-                            <p>
-                              <span>Email: </span> {responsible.email}
-                            </p>
-                            <p>
-                              <span>CPF: </span> {responsible.cpf}
-                            </p>
-                            <p>
-                              <span>Telefone: </span> 11-95506-0047
-                            </p>
-                          </div>
-                          <div className={style.infoButtonContainer}>
-                            <ButtonComponent buttonText="Detalhes" />
+                          <div className={style.responsibleWrap}>
+                            <div className={style.responsibleInfo}>
+                              <p className={style.responsibleName}>{responsible.name}</p>
+                              <p>
+                                <span>Parentesco: </span> {responsible.kinship}
+                              </p>
+                              <p>
+                                <span>Email: </span> {responsible.email}
+                              </p>
+                              <p>
+                                <span>CPF: </span> {responsible.cpf}
+                              </p>
+                              <p>
+                                <span>Telefone: </span> 11-95506-0047
+                              </p>
+                            </div>
+                            <div className={style.infoButtonContainer}>
+                              <ButtonComponent buttonText="Detalhes" />
+                            </div>
                           </div>
                         </li>
                       ))}

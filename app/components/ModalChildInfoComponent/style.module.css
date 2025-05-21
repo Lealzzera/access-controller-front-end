@@ -179,13 +179,124 @@
 }
 
 @media (min-width: 760px) {
+  .notFoundResponsibles {
+    width: 400px;
+    margin: 1rem auto;
+    height: 150px;
+    justify-content: space-between;
+    padding-top: 2rem;
+  }
+
+  .registerResponsibleButton {
+    width: 200px;
+  }
+
   .modalBody {
     width: 600px;
+  }
+
+  .modalBody::-webkit-scrollbar {
+    width: 10px;
+    display: none;
+  }
+
+  .modalBody::-webkit-scrollbar-thumb {
+    width: 5px;
+    display: none;
+  }
+
+  .modalContent {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  .imgContainer {
+    width: 300px;
+    margin: 0 0 0 1rem;
+  }
+
+  .containerInfo {
+    margin: 0 1rem 0 0;
+    flex-grow: 1;
+  }
+
+  .childName {
+    font-size: 1.7rem;
+  }
+
+  .childStats {
+    margin-top: 1.5rem;
+
+    font-size: 1rem;
+    & span {
+      font-weight: bold;
+    }
+  }
+
+  .responsibleCard {
+    display: flex;
+    height: auto;
+    gap: 1rem;
+  }
+
+  .responsiblePictureContainer {
+    width: 250px;
+  }
+
+  .responsiblePictureContainer {
+    display: block;
+  }
+
+  .responsibleInfo {
+    display: block;
+    margin: 0.5rem 0rem 0rem 0rem;
+
+    & p:nth-of-type(2) {
+      margin-top: 1rem;
+    }
+
+    & span {
+      font-size: 1rem;
+    }
+  }
+
+  .responsibleWrap {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    padding-right: 0.5rem;
+  }
+
+  .infoButtonContainer {
+    padding: 0px;
+  }
+
+  .responsibleName {
+    font-size: 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .modalBody {
     width: 800px;
+  }
+
+  .imgContainer {
+    width: 400px;
+  }
+
+  .modalContent {
+    gap: 2.5rem;
+  }
+
+  .responsiblePictureContainer {
+    width: 300px;
+  }
+
+  .responsibleCard {
+    gap: 2rem;
   }
 }
