@@ -174,8 +174,8 @@
   color: var(--gray-600);
 }
 
-.infoContainer {
-  background-color: red;
+.infoButtonContainer {
+  padding: 0.5rem;
 }
 
 @media (min-width: 760px) {
