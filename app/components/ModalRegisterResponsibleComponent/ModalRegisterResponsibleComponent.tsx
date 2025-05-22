@@ -250,10 +250,12 @@ export default function ModalRegisterResponsibleComponent() {
                   inputLabel="Nome"
                   inputType="text"
                   inputValue={responsibleName}
+                  disabled={loadRegisterData}
                   setInputValue={(event) => setResponsibleName(event)}
                 />
                 <InputFieldComponent
                   idInput="cpf"
+                  disabled={loadRegisterData}
                   required
                   inputLabel="CPF"
                   inputType="text"
@@ -261,7 +263,7 @@ export default function ModalRegisterResponsibleComponent() {
                   setInputValue={handleChangeCPF}
                 />
                 <SelectComponent
-                  disabled={false}
+                  disabled={loadRegisterData}
                   labelText="Selecione o grau de parentesco"
                   selectId="kinship"
                   setSelectValue={setKinship}
@@ -272,6 +274,7 @@ export default function ModalRegisterResponsibleComponent() {
                 />
                 <InputFieldComponent
                   idInput="email"
+                  disabled={loadRegisterData}
                   required
                   inputLabel="Email"
                   inputType="email"
@@ -280,6 +283,7 @@ export default function ModalRegisterResponsibleComponent() {
                 />
                 <InputFieldComponent
                   idInput="password"
+                  disabled={loadRegisterData}
                   required
                   inputLabel="Senha"
                   inputType="password"
@@ -289,6 +293,7 @@ export default function ModalRegisterResponsibleComponent() {
                 <InputFieldComponent
                   idInput="confirmPassword"
                   required
+                  disabled={loadRegisterData}
                   inputLabel="Confirmar senha"
                   inputType="password"
                   inputValue={confirmPassword}
@@ -338,6 +343,7 @@ export default function ModalRegisterResponsibleComponent() {
                       Selecionar
                     </label>
                     <input
+                      disabled={loadRegisterData}
                       id="inputFile"
                       accept="image/jpeg, image/jpg, image/png, image/webp"
                       size={60}
@@ -348,6 +354,7 @@ export default function ModalRegisterResponsibleComponent() {
                   </div>
                   <div>
                     <ButtonComponent
+                      disabled={loadRegisterData}
                       style={{
                         fontSize: '12px',
                         textTransform: 'none',
@@ -369,7 +376,8 @@ export default function ModalRegisterResponsibleComponent() {
                       !email.length ||
                       !password.length ||
                       !confirmPassword.length ||
-                      !imagePreviewerData?.length
+                      !imagePreviewerData?.length ||
+                      loadRegisterData
                     }
                     style={{
                       fontSize: '1rem',

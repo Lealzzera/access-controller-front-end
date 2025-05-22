@@ -27,13 +27,8 @@ type ChildrenDataType = {
 };
 
 export default function HomePage() {
-  const {
-    userInfo,
-    registerModalOpen,
-    setRegisterModalOpen,
-    setRegisterResponsibleModalOpen,
-    setLastChildRegisteredInformation,
-  } = useUser();
+  const { userInfo, registerModalOpen, setRegisterModalOpen, registerResponsibleModalOpen } =
+    useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -44,7 +39,6 @@ export default function HomePage() {
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleOpenCard = (cardInfo: ChildrenDataType) => {
-    // setRegisterResponsibleModalOpen(true);
     setOpenModalChildInfo(true);
     setChildInfo(cardInfo);
   };
@@ -88,24 +82,26 @@ export default function HomePage() {
 
         return [...prev, ...newItems];
       });
+
+      if (response.length < 10) {
+        setHasMore(false);
+      }
       setLoading(false);
     },
     [userInfo]
   );
 
   useEffect(() => {
-    if (!registerModalOpen) {
-      setChildrenData([]);
-      setCurrentPage(1);
-      setHasMore(true);
-    }
-  }, [registerModalOpen]);
-
-  useEffect(() => {
     if (userInfo && hasMore && !loading && !registerModalOpen) {
       getChildrenListByUserId(currentPage);
     }
   }, [userInfo, currentPage, hasMore, registerModalOpen]);
+
+  useEffect(() => {
+    if (!registerResponsibleModalOpen) {
+      setChildInfo(undefined);
+    }
+  }, [registerResponsibleModalOpen]);
 
   return (
     <>
