@@ -41,10 +41,20 @@ export default function SelectComponent({
         name={selectName}
         disabled={disabled}
       >
-        <option value="" defaultValue={labelText ?? ''} hidden>
-          {labelText}
+        <option
+          value=""
+          defaultValue={
+            selectOptions && selectOptions.length > 0
+              ? labelText
+              : 'Não existem opções para selecionar'
+          }
+          hidden
+        >
+          {selectOptions && selectOptions.length > 0
+            ? labelText
+            : 'Não existem opções para selecionar'}
         </option>
-        {selectOptions.map((option) => (
+        {selectOptions?.map((option) => (
           <option key={option.id} value={option.id}>
             {option.name}
           </option>

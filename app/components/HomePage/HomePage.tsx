@@ -9,6 +9,7 @@ import { CircularProgress } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import ModalChildInfoComponent from '../ModalChildInfoComponent/ModalChildInfoComponent';
+import { Role } from '@/app/enums/Role.enum';
 
 type ChildrenDataType = {
   id: string;
@@ -98,6 +99,10 @@ export default function HomePage() {
   }, [userInfo, currentPage, hasMore, registerModalOpen]);
 
   useEffect(() => {
+    if (!registerModalOpen) getChildrenListByUserId(currentPage);
+  }, [registerModalOpen]);
+
+  useEffect(() => {
     if (!registerResponsibleModalOpen) {
       setChildInfo(undefined);
     }
@@ -121,20 +126,23 @@ export default function HomePage() {
         </div>
       )}
       <section className={style.container}>
-        {childrenData.length === 0 && !loading && loading !== undefined && (
-          <div className={style.noChildrenData}>
-            <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
-            <div className={style.registerChildButton}>
-              <ButtonComponent
-                style={{
-                  cursor: 'pointer',
-                }}
-                onClick={() => setRegisterModalOpen(true)}
-                buttonText="Cadastrar"
-              />
+        {childrenData.length === 0 &&
+          !loading &&
+          loading !== undefined &&
+          userInfo?.role === Role.INSTITUTION && (
+            <div className={style.noChildrenData}>
+              <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
+              <div className={style.registerChildButton}>
+                <ButtonComponent
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setRegisterModalOpen(true)}
+                  buttonText="Cadastrar"
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
         {childrenData.length > 0 &&
           childrenData.map((child, index) => {
             const isLastCard = index === childrenData.length - 1;

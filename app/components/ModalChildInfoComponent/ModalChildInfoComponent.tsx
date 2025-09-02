@@ -7,6 +7,7 @@ import { getResponsibleListByChildId } from '@/app/actions/getResponsibleListByC
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import { useUser } from '@/app/context/userContext';
 import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
+import { Role } from '@/app/enums/Role.enum';
 
 type ModalChildInfoComponentProps = {
   isModalChildInfoOpen: boolean;
@@ -32,7 +33,8 @@ export default function ModalChildInfoComponent({
   const [loading, setLoading] = useState(false);
   const [childResponsibles, setChildResponsibles] = useState([]);
   const modalRef = useRef(null);
-  const { setRegisterResponsibleModalOpen, setLastChildRegisteredInformation } = useUser();
+  const { userInfo, setRegisterResponsibleModalOpen, setLastChildRegisteredInformation } =
+    useUser();
 
   const handleCloseModal = () => {
     setIsModalChildInfoOpen(false);
@@ -64,7 +66,6 @@ export default function ModalChildInfoComponent({
   useEffect(() => {
     if (!childInfo) return;
     generateChildAge();
-    console.log(childInfo);
     const fetchResponsibles = async () => {
       setLoading(true);
       const response = await getResponsibleListByChildId(childInfo.id);
@@ -103,7 +104,7 @@ export default function ModalChildInfoComponent({
                     <h1 className={style.childName}>{childInfo.name}</h1>
                     <div className={style.childStats}>
                       <p>
-                        <span>Idade: </span> {childAge}
+                        <span>Idade: </span> {childAge} anos
                       </p>
                       <p>
                         <span>Período: </span> {childInfo.period.name}
@@ -126,7 +127,7 @@ export default function ModalChildInfoComponent({
                   <h1 className={style.childName}>Responsáveis</h1>
                   {childResponsibles.length === 0 && (
                     <div className={style.notFoundResponsibles}>
-                      <p>Não existem responsáveis cadastrados.</p>
+                      <p>Não há responsáveis cadastrados.</p>
                       <div className={style.registerResponsibleButton}>
                         <ButtonComponent
                           onClick={handleOpenRegisterResponsibleModal}
@@ -170,21 +171,23 @@ export default function ModalChildInfoComponent({
                           </div>
                         </li>
                       ))}
-                      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                        <ButtonComponent
-                          onClick={handleOpenRegisterResponsibleModal}
-                          buttonText="Novo Responsável"
-                          style={{
-                            fontSize: '1rem',
-                            textTransform: 'none',
-                            backgroundColor: '#a8d0db',
-                            boxShadow: 'none',
-                            fontWeight: 'bold',
-                            color: '#044b7f',
-                            width: '265px',
-                          }}
-                        />
-                      </div>
+                      {userInfo?.role === Role.INSTITUTION && (
+                        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                          <ButtonComponent
+                            onClick={handleOpenRegisterResponsibleModal}
+                            buttonText="Novo Responsável"
+                            style={{
+                              fontSize: '1rem',
+                              textTransform: 'none',
+                              backgroundColor: '#a8d0db',
+                              boxShadow: 'none',
+                              fontWeight: 'bold',
+                              color: '#044b7f',
+                              width: '265px',
+                            }}
+                          />
+                        </div>
+                      )}
                     </ul>
                   )}
                 </div>

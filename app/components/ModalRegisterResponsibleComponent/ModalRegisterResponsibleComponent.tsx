@@ -237,7 +237,7 @@ export default function ModalRegisterResponsibleComponent() {
               <div className={style.registerInformationText}>
                 <h1 className={style.modalTitle}>Cadastrar responsável</h1>
                 <p className={style.modalDescription}>
-                  Vamos cadastrar um responsável para o{' '}
+                  Vamos cadastrar um responsável para{' '}
                   {lastChildRegisteredInformation && (
                     <span>{lastChildRegisteredInformation.name}</span>
                   )}
