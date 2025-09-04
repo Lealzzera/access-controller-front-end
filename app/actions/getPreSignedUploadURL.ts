@@ -2,15 +2,23 @@
 
 import { apiClient } from './apiClient';
 
-export async function getPreSignedUploadURL(
-  photoId: string,
-  fileType: string | undefined,
-  folder: string
-) {
+type getPreSignedUPloadURLBody = {
+  folderName: string;
+  fileName: string;
+  fileType: string;
+};
+
+export async function getPreSignedUploadURL({
+  folderName,
+  fileName,
+  fileType,
+}: getPreSignedUPloadURLBody) {
+  const body = JSON.stringify({ fileName: `${folderName}/${fileName}`, fileType });
   try {
     const response = await apiClient({
-      path: `/uploads/generate-presigned-url?fileName=${folder}/${photoId}&fileType=${fileType}`,
-      method: 'GET',
+      path: `/s3/upload/get-presigned-url`,
+      method: 'POST',
+      body,
     });
 
     const { url } = await response.json();

@@ -143,6 +143,11 @@ export default function HomePage() {
               </div>
             </div>
           )}
+        {!childrenData.length && !loading && userInfo?.role === Role.RESPONSIBLE && (
+          <div className={style.noChildrenData}>
+            <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
+          </div>
+        )}
         {childrenData.length > 0 &&
           childrenData.map((child, index) => {
             const isLastCard = index === childrenData.length - 1;

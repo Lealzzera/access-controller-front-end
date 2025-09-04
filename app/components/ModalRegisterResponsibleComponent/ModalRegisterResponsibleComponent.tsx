@@ -106,11 +106,11 @@ export default function ModalRegisterResponsibleComponent() {
       return;
     }
 
-    const s3URL = await getPreSignedUploadURL(
-      response.responsible.id,
-      fileData?.type,
-      'responsible'
-    );
+    const s3URL = await getPreSignedUploadURL({
+      folderName: 'responsible',
+      fileName: response.responsible.id,
+      fileType: fileData.type,
+    });
     const url = new URL(s3URL);
     const pictureUrl = `${url.origin}${url.pathname}`;
     const responsePicture = await postPictureToS3(s3URL, fileData);

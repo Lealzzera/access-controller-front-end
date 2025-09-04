@@ -94,13 +94,15 @@ export default function ModalRegisterChildComponent() {
     if (responseRegister.statusCode === 400) {
       notifyError('CPF já cadastrado');
       setLoadRegisterData(false);
+      return;
     }
 
-    const presignedUrl = await getPreSignedUploadURL(
-      responseRegister.child.id,
-      fileData?.type,
-      'child'
-    );
+    const presignedUrl = await getPreSignedUploadURL({
+      folderName: 'child',
+      fileName: responseRegister.child.id,
+      fileType: fileData.type,
+    });
+
     const url = new URL(presignedUrl);
     const pictureUrl = `${url.origin}${url.pathname}`;
     const response = await postPictureToS3(presignedUrl, fileData);
