@@ -1,0 +1,34 @@
+.cardContainer {
+  background-color: var(--gray-100);
+  border-radius: 8px;
+  width: 100%;
+  display: flex;
+  cursor: pointer;
+  font-size: 1rem;
+  align-items: center;
+  padding: 0.5rem;
+  gap: 1.5rem;
+  box-shadow: 3px 3px 5px 0px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
+}
+
+.imageContainer {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.imgContent {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.infoContainer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 65%;
+}

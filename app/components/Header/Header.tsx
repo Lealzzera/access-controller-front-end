@@ -11,7 +11,7 @@ import React from 'react';
 
 export default function Header() {
   const router = useRouter();
-  const { userInfo, setRegisterModalOpen } = useUser();
+  const { userInfo } = useUser();
   const [userName, setUserName] = useState<string | undefined>('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -31,9 +31,14 @@ export default function Header() {
     router.push('/');
   };
 
-  const handleRegisterChildFunction = () => {
+  const handleDirectToResponsiblesList = () => {
+    router.push('/responsibles');
     handleCloseMenu();
-    setRegisterModalOpen(true);
+  };
+
+  const handleDirectToChildrenList = () => {
+    router.push('/children');
+    handleCloseMenu();
   };
 
   useEffect(() => {
@@ -49,7 +54,8 @@ export default function Header() {
               <MenuIcon />
             </button>
             <Menu onClose={handleCloseMenu} id="basic-menu" open={open} anchorEl={anchorEl}>
-              <MenuItem onClick={handleRegisterChildFunction}>Cadastrar Criança</MenuItem>
+              <MenuItem onClick={handleDirectToChildrenList}>Lista de crianças</MenuItem>
+              <MenuItem onClick={handleDirectToResponsiblesList}>Lista de responsáveis</MenuItem>
               <MenuItem onClick={logoutFunction}>Sair</MenuItem>
             </Menu>
           </div>
