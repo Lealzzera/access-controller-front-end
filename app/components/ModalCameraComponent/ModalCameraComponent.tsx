@@ -4,7 +4,6 @@ import { Skeleton } from '@mui/material';
 import style from './style.module.css';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
-import { base64ToBlobConverter } from '@/app/helpers/base64ToBlobConverter';
 import compressFile from '@/app/helpers/compressFile';
 
 type ModalCameraComponentProps = {
@@ -41,7 +40,7 @@ export default function ModalCameraComponent({
     takePicture();
   };
 
-  const takePicture = async () => {
+  const takePicture = () => {
     if (!stream?.active) return;
     if (imagePreviewerData?.length) return;
     const video = document.getElementById('camera') as HTMLVideoElement;
@@ -52,27 +51,26 @@ export default function ModalCameraComponent({
     if (context && photoContainer) {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const imageDataURL = canvas.toDataURL('image/png');
-      const imageContent = document.createElement('img');
-      const screenSize = window.innerWidth;
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
 
-      imageContent.style.width = screenSize >= 760 ? '480px' : '280px';
-      imageContent.style.borderRadius = '8px';
-      imageContent.style.marginTop = '8px';
-      imageContent.src = imageDataURL;
+        const file = new File([blob], 'foto.jpg', { type: blob.type });
+        const finalFile = await compressFile(file);
+        setFileData(finalFile);
 
-      photoContainer.appendChild(imageContent);
+        const url = URL.createObjectURL(finalFile);
+        const imageContent = document.createElement('img');
+        const screenSize = window.innerWidth;
 
-      const blobFile = base64ToBlobConverter(imageDataURL);
-      const file = new File([blobFile], 'foto.jpg', {
-        type: blobFile.type,
-      });
+        imageContent.style.width = screenSize >= 760 ? '480px' : '280px';
+        imageContent.style.borderRadius = '8px';
+        imageContent.style.marginTop = '8px';
+        imageContent.src = url;
 
-      const finalFile = await compressFile(file);
-      setFileData(finalFile);
-      const url = URL.createObjectURL(finalFile);
-      setImagePreviewerData(url);
-      setFileName('');
+        photoContainer.appendChild(imageContent);
+        setImagePreviewerData(url);
+        setFileName('');
+      }, 'image/png');
     }
   };
 

@@ -2,32 +2,13 @@
 
 import { apiClient } from './apiClient';
 
-interface RegisterResponsibleData {
-  institutionId: string;
-  childId: string;
-  name: string;
-  email: string;
-  password: string;
-  cpf: string;
-  kinshipId: string;
-}
-
-export async function registerResponsible({
-  institutionId,
-  childId,
-  name,
-  email,
-  password,
-  cpf,
-  kinshipId,
-}: RegisterResponsibleData) {
+export async function registerResponsible(formData: FormData) {
   try {
-    const body = JSON.stringify({ institutionId, childId, name, email, password, cpf, kinshipId });
-
+    console.log(formData);
     const response = await apiClient({
       path: '/responsible/register',
       method: 'POST',
-      body,
+      body: formData,
     });
     const data = await response.json();
     return data;

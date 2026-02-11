@@ -9,13 +9,14 @@ type ApiClientType = {
 
 export async function apiClient({ path, method, headers, body }: ApiClientType) {
   const userTokenFromCookie = (await cookies()).get('access_token');
+  const isFormData = body instanceof FormData;
 
   const response = await fetch(`${process.env.BACKEND_URL}${path}`, {
     method,
     headers: {
       ...headers,
       Authorization: userTokenFromCookie ? `Bearer: ${userTokenFromCookie.value}` : '',
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     },
     body,
     credentials: 'include',

@@ -9,35 +9,25 @@ import { CircularProgress } from '@mui/material';
 import NoPhotographyRoundedIcon from '@mui/icons-material/NoPhotographyRounded';
 import Image from 'next/image';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { getKinshipList } from '@/app/actions/getKinshipList';
-import SelectComponent from '../SelectComponent/SelectComponent';
-import { KINSHIP } from '@/app/enums/Kinship.enum';
 import ModalCameraComponent from '../ModalCameraComponent/ModalCameraComponent';
 import { handleStartCamera } from '@/app/helpers/handleStartCamera';
 import maskCpfFunction from '@/app/helpers/maskCpfFunction';
 import { registerResponsible } from '@/app/actions/registerResponsible';
 import { ErrorMessagesEnum } from '@/app/enums/ErrorMessages.enum';
-import { getPreSignedUploadURL } from '@/app/actions/getPreSignedUploadURL';
 import compressFile from '@/app/helpers/compressFile';
-import postPictureToS3 from '@/app/actions/postPictureToS3';
-import { updateResponsible } from '@/app/actions/updateResponsible';
 import { toast, ToastContainer } from 'react-toastify';
 import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
 
-type KinshipType = {
-  id: string;
-  value: number;
-  name: string;
+type ModalRegisterResponsibleComponentProps = {
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
 };
 
-export default function ModalRegisterResponsibleComponent() {
-  const {
-    registerResponsibleModalOpen,
-    setRegisterResponsibleModalOpen,
-    lastChildRegisteredInformation,
-    setLastChildRegisteredInformation,
-    userInfo,
-  } = useUser();
+export default function ModalRegisterResponsibleComponent({
+  isModalOpen,
+  setIsModalOpen,
+}: ModalRegisterResponsibleComponentProps) {
+  const { userInfo } = useUser();
 
   const [loadRegisterData, setLoadRegisterData] = useState(false);
   const [imagePreviewerData, setImagePreviewerData] = useState<string | undefined>(undefined);
@@ -49,11 +39,9 @@ export default function ModalRegisterResponsibleComponent() {
 
   const [responsibleName, setResponsibleName] = useState('');
   const [responsibleCpf, setResponsibleCpf] = useState('');
-  const [kinship, setKinship] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [kinshipList, setKinshipList] = useState([]);
 
   const modalBg = useRef<HTMLDivElement | null>(null);
 
@@ -78,7 +66,7 @@ export default function ModalRegisterResponsibleComponent() {
   const handleRegister = async (event: any) => {
     setLoadRegisterData(true);
     event.preventDefault();
-    if (!userInfo || !lastChildRegisteredInformation || !fileData) return;
+    if (!userInfo || !fileData) return;
 
     if (password !== confirmPassword) {
       notifyError('As senhas digitadas não conferem.');
@@ -87,15 +75,15 @@ export default function ModalRegisterResponsibleComponent() {
     }
     const cleanCpf = cleanCpfNumber(responsibleCpf);
 
-    const response = await registerResponsible({
-      institutionId: userInfo?.id,
-      childId: lastChildRegisteredInformation?.id,
-      cpf: cleanCpf,
-      email,
-      kinshipId: kinship,
-      name: responsibleName,
-      password,
-    });
+    const formData = new FormData();
+    formData.append('picture', fileData);
+    formData.append('institutionId', userInfo.id);
+    formData.append('name', responsibleName);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('cpf', cleanCpf);
+
+    const response = await registerResponsible(formData);
 
     const messageError = Array.isArray(response.message) ? response.message[0] : response.message;
     const friendlyMessage = errorMap[messageError];
@@ -106,21 +94,6 @@ export default function ModalRegisterResponsibleComponent() {
       return;
     }
 
-    const s3URL = await getPreSignedUploadURL({
-      folderName: 'responsible',
-      fileName: response.responsible.id,
-      fileType: fileData.type,
-    });
-    const url = new URL(s3URL);
-    const pictureUrl = `${url.origin}${url.pathname}`;
-    const responsePicture = await postPictureToS3(s3URL, fileData);
-
-    if (responsePicture.status === 200) {
-      await updateResponsible({
-        id: response.responsible.id,
-        picture: pictureUrl,
-      });
-    }
     setLoadRegisterData(false);
     notifySuccess();
     handleCloseModal();
@@ -156,7 +129,6 @@ export default function ModalRegisterResponsibleComponent() {
     setLoadCameraData(false);
     setStream(undefined);
     setLoadRegisterData(false);
-    setKinship('');
     setEmail('');
     setPassword('');
     setConfirmPassword('');
@@ -164,8 +136,7 @@ export default function ModalRegisterResponsibleComponent() {
 
   const handleCloseModal = () => {
     resetAllStatus();
-    setRegisterResponsibleModalOpen(false);
-    setLastChildRegisteredInformation(undefined);
+    setIsModalOpen(false);
   };
 
   const handleOpenCameraModal = () => {
@@ -192,24 +163,6 @@ export default function ModalRegisterResponsibleComponent() {
   };
 
   useEffect(() => {
-    if (lastChildRegisteredInformation) {
-      setRegisterResponsibleModalOpen(true);
-    }
-  }, [lastChildRegisteredInformation]);
-
-  useEffect(() => {
-    const fetchKinshipList = async () => {
-      const response = await getKinshipList();
-      const kinshipFormatted = response.map((item: KinshipType) => {
-        return { ...item, name: KINSHIP[item.name as keyof typeof KINSHIP] };
-      });
-
-      setKinshipList(kinshipFormatted);
-    };
-    fetchKinshipList();
-  }, []);
-
-  useEffect(() => {
     if (cameraModalOpen) {
       const handleOpenCamera = async () => {
         handleStartCamera({ setLoadCameraData, setStream });
@@ -222,7 +175,7 @@ export default function ModalRegisterResponsibleComponent() {
   return (
     <>
       <ToastContainer containerId="success-container" />
-      {registerResponsibleModalOpen && (
+      {isModalOpen && (
         <div ref={modalBg} onClick={handleClickOutSide} className={style.registerModalBg}>
           {!cameraModalOpen ? (
             <div className={style.registerModalContent}>
@@ -236,12 +189,6 @@ export default function ModalRegisterResponsibleComponent() {
               <ToastContainer containerId="error-container" />
               <div className={style.registerInformationText}>
                 <h1 className={style.modalTitle}>Cadastrar responsável</h1>
-                <p className={style.modalDescription}>
-                  Vamos cadastrar um responsável para{' '}
-                  {lastChildRegisteredInformation && (
-                    <span>{lastChildRegisteredInformation.name}</span>
-                  )}
-                </p>
               </div>
               <form className={style.registerForm} onSubmit={handleRegister}>
                 <InputFieldComponent
@@ -261,16 +208,6 @@ export default function ModalRegisterResponsibleComponent() {
                   inputType="text"
                   inputValue={responsibleCpf}
                   setInputValue={handleChangeCPF}
-                />
-                <SelectComponent
-                  disabled={loadRegisterData}
-                  labelText="Selecione o grau de parentesco"
-                  selectId="kinship"
-                  setSelectValue={setKinship}
-                  selectName="kinship"
-                  selectLabel="Grau de parentesco"
-                  selectOptions={kinshipList}
-                  required
                 />
                 <InputFieldComponent
                   idInput="email"
@@ -372,7 +309,6 @@ export default function ModalRegisterResponsibleComponent() {
                     disabled={
                       !responsibleName.length ||
                       responsibleCpf.length < 14 ||
-                      !kinship.length ||
                       !email.length ||
                       !password.length ||
                       !confirmPassword.length ||

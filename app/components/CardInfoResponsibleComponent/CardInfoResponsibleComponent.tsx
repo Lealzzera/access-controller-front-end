@@ -10,6 +10,7 @@ type CardInfoResponsibleComponentProps = {
   cpf: string;
   phoneNumber: string;
   picture: string;
+  onClick?: () => void;
 };
 
 export default function CardInfoResponsibleComponent({
@@ -18,9 +19,10 @@ export default function CardInfoResponsibleComponent({
   cpf,
   phoneNumber,
   picture,
+  onClick,
 }: CardInfoResponsibleComponentProps) {
   return (
-    <div className={style.cardContainer}>
+    <div className={style.cardContainer} onClick={onClick}>
       <div className={style.imageContainer}>
         {picture ? (
           <Image
