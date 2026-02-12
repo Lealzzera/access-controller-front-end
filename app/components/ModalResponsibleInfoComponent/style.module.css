@@ -1,8 +1,8 @@
 .modalBg {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100vh;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   align-items: center;
@@ -10,54 +10,99 @@
   display: flex;
   z-index: 99999;
   overflow: auto;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modalBody {
-  width: 300px;
-  background-color: var(--gray-100);
-  height: 80vh;
-  border-radius: 8px;
-  overflow: auto;
+  width: 340px;
+  max-height: 85vh;
+  background-color: var(--white);
+  border-radius: 12px;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.25s ease-out;
+}
+
+.modalBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
 }
 
 .closeButtonContainer {
   display: flex;
   justify-content: flex-end;
-  padding: 1rem 1rem 0rem 0rem;
+  padding: 0.75rem 0.75rem 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .closeIcon {
   cursor: pointer;
-  color: var(--blue-400);
+  color: var(--gray-600);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.closeIcon:hover {
+  opacity: 1;
 }
 
 .modalContent {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 1.25rem 1.25rem;
 }
 
 .imgContainer {
   background-color: black;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: 0 auto;
+  max-height: 250px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .responsibleImg {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  max-height: 250px;
+  border-radius: 6px;
+  object-fit: contain;
 }
 
 .containerInfo {
-  margin: 1rem;
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -65,113 +110,33 @@
 }
 
 .responsibleName {
-  font-size: 1.2rem;
-  color: var(--gray-600);
-  font-weight: bold;
+  font-size: 1.25rem;
+  color: var(--gray-900);
+  font-weight: 700;
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .responsibleStats {
   color: var(--gray-600);
-  font-size: 14px;
+  font-size: 13px;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  width: 100%;
-  padding: 0 1rem;
-
-  & span {
-    font-weight: bold;
-  }
-
-  & p {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-.childrenListContainer {
-  margin: 1rem;
-}
-
-.childrenListTitle {
-  font-size: 1rem;
-  color: var(--gray-600);
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.childrenList {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.childCard {
-  background-color: #fff;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem;
-  box-shadow: 3px 3px 5px 0px rgba(0, 0, 0, 0.1);
-}
-
-.childPictureContainer {
-  width: 60px;
-  height: 60px;
-  min-width: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: black;
-}
-
-.childPicture {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.childInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  color: var(--gray-600);
-  overflow: hidden;
-
-  & p {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 14px;
-  }
-
-  & span {
-    font-weight: bold;
-  }
-}
-
-.childNameText {
-  font-weight: bold;
-  font-size: 1rem !important;
-  color: var(--gray-600);
-}
-
-.notFoundChildren {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1rem;
-  justify-content: center;
-  align-items: center;
   gap: 0.5rem;
+  width: 100%;
+  background-color: var(--gray-100);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+
+  & span {
+    font-weight: 600;
+    color: var(--gray-900);
+  }
 
   & p {
-    text-align: center;
-    font-size: 14px;
-    color: var(--gray-600);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -180,83 +145,45 @@
     width: 600px;
   }
 
-  .modalBody::-webkit-scrollbar {
-    width: 10px;
-    display: none;
-  }
-
-  .modalBody::-webkit-scrollbar-thumb {
-    width: 5px;
-    display: none;
-  }
-
   .modalContent {
     flex-direction: row;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 0 1rem;
+    gap: 1.5rem;
+    padding: 0 1.5rem 1.5rem;
   }
 
   .imgContainer {
-    width: 180px;
-    height: 180px;
-    min-width: 180px;
-    margin: 0;
+    width: 250px;
+    min-width: 250px;
   }
 
   .containerInfo {
     align-items: flex-start;
-    margin: 0;
+    margin-top: 0;
     flex-grow: 1;
   }
 
   .responsibleName {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
     text-align: left;
   }
 
   .responsibleStats {
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    padding: 0;
-  }
-
-  .childCard {
-    gap: 1.5rem;
-    padding: 0.75rem;
-  }
-
-  .childPictureContainer {
-    width: 70px;
-    height: 70px;
-    min-width: 70px;
-  }
-
-  .childInfo {
-    & p {
-      font-size: 1rem;
-    }
+    font-size: 14px;
   }
 }
 
 @media (min-width: 1024px) {
   .modalBody {
-    width: 800px;
+    width: 750px;
   }
 
   .imgContainer {
-    width: 200px;
-    height: 200px;
-    min-width: 200px;
+    width: 300px;
+    min-width: 300px;
   }
 
   .modalContent {
-    gap: 2.5rem;
-  }
-
-  .childrenList {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 2rem;
   }
 }
