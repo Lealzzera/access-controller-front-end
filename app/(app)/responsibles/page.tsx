@@ -41,7 +41,6 @@ export default function Responsibles() {
     );
     setCurrentCursor(result.nextCursor ?? '');
     setHasMore(!!result.nextCursor);
-    console.log(result);
 
     if (isInitial) setLoading(false);
     else setLoadingMore(false);

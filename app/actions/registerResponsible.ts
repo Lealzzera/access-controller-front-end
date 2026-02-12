@@ -4,7 +4,6 @@ import { apiClient } from './apiClient';
 
 export async function registerResponsible(formData: FormData) {
   try {
-    console.log(formData);
     const response = await apiClient({
       path: '/responsible/register',
       method: 'POST',
