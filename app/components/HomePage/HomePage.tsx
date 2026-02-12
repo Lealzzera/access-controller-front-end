@@ -28,8 +28,7 @@ type ChildrenDataType = {
 };
 
 export default function HomePage() {
-  const { userInfo, registerModalOpen, setRegisterModalOpen, registerResponsibleModalOpen } =
-    useUser();
+  const { userInfo } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -93,20 +92,10 @@ export default function HomePage() {
   );
 
   useEffect(() => {
-    if (userInfo && hasMore && !loading && !registerModalOpen) {
+    if (userInfo && hasMore && !loading) {
       getChildrenListByUserId(currentPage);
     }
-  }, [userInfo, currentPage, hasMore, registerModalOpen]);
-
-  useEffect(() => {
-    if (!registerModalOpen) getChildrenListByUserId(currentPage);
-  }, [registerModalOpen]);
-
-  useEffect(() => {
-    if (!registerResponsibleModalOpen) {
-      setChildInfo(undefined);
-    }
-  }, [registerResponsibleModalOpen]);
+  }, [userInfo, currentPage, hasMore]);
 
   return (
     <>
@@ -132,15 +121,6 @@ export default function HomePage() {
           userInfo?.role === Role.INSTITUTION && (
             <div className={style.noChildrenData}>
               <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
-              <div className={style.registerChildButton}>
-                <ButtonComponent
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => setRegisterModalOpen(true)}
-                  buttonText="Cadastrar"
-                />
-              </div>
             </div>
           )}
         {!childrenData.length && !loading && userInfo?.role === Role.RESPONSIBLE && (

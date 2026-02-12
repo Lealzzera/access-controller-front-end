@@ -12,11 +12,13 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ModalCameraComponent from '../ModalCameraComponent/ModalCameraComponent';
 import { handleStartCamera } from '@/app/helpers/handleStartCamera';
 import maskCpfFunction from '@/app/helpers/maskCpfFunction';
+import maskPhoneFunction from '@/app/helpers/maskPhoneFunction';
 import { registerResponsible } from '@/app/actions/registerResponsible';
 import { ErrorMessagesEnum } from '@/app/enums/ErrorMessages.enum';
 import compressFile from '@/app/helpers/compressFile';
 import { toast, ToastContainer } from 'react-toastify';
 import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
+import cleanPhoneNumber from '@/app/helpers/cleanPhoneNumber';
 
 type ModalRegisterResponsibleComponentProps = {
   isModalOpen: boolean;
@@ -39,6 +41,7 @@ export default function ModalRegisterResponsibleComponent({
 
   const [responsibleName, setResponsibleName] = useState('');
   const [responsibleCpf, setResponsibleCpf] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -74,6 +77,7 @@ export default function ModalRegisterResponsibleComponent({
       return;
     }
     const cleanCpf = cleanCpfNumber(responsibleCpf);
+    const cleanPhone = cleanPhoneNumber(phoneNumber);
 
     const formData = new FormData();
     formData.append('picture', fileData);
@@ -82,6 +86,7 @@ export default function ModalRegisterResponsibleComponent({
     formData.append('email', email);
     formData.append('password', password);
     formData.append('cpf', cleanCpf);
+    formData.append('phoneNumber', cleanPhone);
 
     const response = await registerResponsible(formData);
 
@@ -122,6 +127,7 @@ export default function ModalRegisterResponsibleComponent({
   const resetAllStatus = () => {
     setResponsibleName('');
     setResponsibleCpf('');
+    setPhoneNumber('');
     setCameraModalOpen(false);
     setImagePreviewerData(undefined);
     setFileName('');
@@ -149,6 +155,11 @@ export default function ModalRegisterResponsibleComponent({
   const handleChangeCPF = (value: string) => {
     const cpfNumber = maskCpfFunction(value);
     setResponsibleCpf(cpfNumber);
+  };
+
+  const handleChangePhone = (value: string) => {
+    const phoneFormatted = maskPhoneFunction(value);
+    setPhoneNumber(phoneFormatted);
   };
 
   const handleChangeImage = async (event: any) => {
@@ -208,6 +219,15 @@ export default function ModalRegisterResponsibleComponent({
                   inputType="text"
                   inputValue={responsibleCpf}
                   setInputValue={handleChangeCPF}
+                />
+                <InputFieldComponent
+                  idInput="phoneNumber"
+                  disabled={loadRegisterData}
+                  required
+                  inputLabel="Telefone"
+                  inputType="text"
+                  inputValue={phoneNumber}
+                  setInputValue={handleChangePhone}
                 />
                 <InputFieldComponent
                   idInput="email"
@@ -309,6 +329,7 @@ export default function ModalRegisterResponsibleComponent({
                     disabled={
                       !responsibleName.length ||
                       responsibleCpf.length < 14 ||
+                      phoneNumber.replace(/\D/g, '').length < 11 ||
                       !email.length ||
                       !password.length ||
                       !confirmPassword.length ||
