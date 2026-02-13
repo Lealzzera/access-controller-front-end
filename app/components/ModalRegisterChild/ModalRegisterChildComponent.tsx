@@ -18,6 +18,7 @@ import { getPeriodsByInstituionId } from '@/app/actions/getPeriodsByInstitutionI
 import ModalCameraComponent from '../ModalCameraComponent/ModalCameraComponent';
 import compressFile from '@/app/helpers/compressFile';
 import { registerChild } from '@/app/actions/registerChild';
+import { getResponsiblesPaginated } from '@/app/actions/getResponsiblesPaginated';
 import { getPreSignedUploadURL } from '@/app/actions/getPreSignedUploadURL';
 import { updateChild } from '@/app/actions/updateChild';
 import postPictureToS3 from '@/app/actions/postPictureToS3';
@@ -29,11 +30,13 @@ import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
 type ModalRegisterChildComponentProps = {
   handleBackModal: () => void;
   isModalOpen: (value: boolean) => void;
+  responsibleId: string;
 };
 
 export default function ModalRegisterChildComponent({
   handleBackModal,
   isModalOpen,
+  responsibleId,
 }: ModalRegisterChildComponentProps) {
   const { userInfo } = useUser();
 
@@ -51,6 +54,7 @@ export default function ModalRegisterChildComponent({
   const [loadCameraData, setLoadCameraData] = useState(false);
   const [stream, setStream] = useState<MediaStream | undefined>(undefined);
   const [loadRegisterData, setLoadRegisterData] = useState(false);
+  const [kinship, setKinship] = useState('');
 
   const modalContainer = useRef(null);
 
@@ -73,6 +77,7 @@ export default function ModalRegisterChildComponent({
     setStream(undefined);
     setBirthDate('');
     setLoadRegisterData(false);
+    setKinship('');
   };
 
   const handleCloseModal = () => {
@@ -90,35 +95,23 @@ export default function ModalRegisterChildComponent({
     setLoadRegisterData(true);
     const parsedDate = parseDateWithDateFns(birthDate);
     const cleanCpf = cleanCpfNumber(cpf);
-    const responseRegister = await registerChild({
-      name,
-      birthDate: parsedDate,
-      periodId: period,
-      gradeId: grade,
-      cpf: cleanCpf,
-      institutionId: userInfo.id,
-    });
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('picture', fileData);
+    formData.append('cpf', cleanCpf);
+    formData.append('periodId', period);
+    formData.append('gradeId', grade);
+    formData.append('birthDate', parsedDate?.toISOString() ?? '');
+    formData.append('institutionId', userInfo.id);
+    formData.append('responsibleId', responsibleId);
+    formData.append('kinship', kinship);
+    const responseRegister = await registerChild(formData);
 
     if (responseRegister.statusCode === 400) {
       notifyError('CPF já cadastrado');
       setLoadRegisterData(false);
       return;
-    }
-
-    const presignedUrl = await getPreSignedUploadURL({
-      folderName: 'child',
-      fileName: responseRegister.child.id,
-      fileType: fileData.type,
-    });
-
-    const url = new URL(presignedUrl);
-    const pictureUrl = `${url.origin}${url.pathname}`;
-    const response = await postPictureToS3(presignedUrl, fileData);
-    if (response.status === 200) {
-      await updateChild({
-        id: responseRegister.child.id,
-        picture: pictureUrl,
-      });
     }
 
     setLoadRegisterData(false);
@@ -167,9 +160,10 @@ export default function ModalRegisterChildComponent({
   useEffect(() => {
     if (!userInfo?.id) return;
     const fetchData = async () => {
-      const [gradeResponse, periodResponse] = await Promise.all([
+      const [gradeResponse, periodResponse, responsibleResponse] = await Promise.all([
         getGradesByInstituionId(userInfo?.id),
         getPeriodsByInstituionId(userInfo.id),
+        getResponsiblesPaginated({ cursor: '', take: 100 }),
       ]);
       setGradeOptions(gradeResponse);
       setPeriodOptions(periodResponse);
@@ -289,6 +283,16 @@ export default function ModalRegisterChildComponent({
               selectName="grade"
               labelText="Selecione uma turma"
             />
+            <InputFieldComponent
+              required={true}
+              disabled={loadRegisterData}
+              idInput="kinship"
+              inputLabel="Parentesco"
+              setInputValue={setKinship}
+              inputValue={kinship}
+              inputType="text"
+              placeholder="Ex: Mãe, Pai, Avó, Tio"
+            />
             <div
               style={{
                 backgroundColor: imagePreviewerData ? 'transparent' : 'rgba(0, 0, 0, 0.4)',
@@ -372,6 +376,7 @@ export default function ModalRegisterChildComponent({
                   cpf.length < 14 ||
                   !period ||
                   !grade ||
+                  !responsibleId ||
                   !imagePreviewerData ||
                   loadRegisterData
                 }

@@ -115,6 +115,7 @@ export default function ModalResponsibleInfoComponent({
             <div className={style.modalBody}>
               <ModalRegisterChildComponent
                 handleBackModal={backToResponsibleInfo}
+                responsibleId={responsibleInfo!.id}
                 isModalOpen={handleCloseModal}
               />
             </div>
