@@ -109,7 +109,7 @@ export default function ModalRegisterChildComponent({
     const responseRegister = await registerChild(formData);
 
     if (responseRegister.statusCode === 400) {
-      notifyError('CPF já cadastrado');
+      notifyError('Ocorreu um erro ao cadastrar a criança');
       setLoadRegisterData(false);
       return;
     }
