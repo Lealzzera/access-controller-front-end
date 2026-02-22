@@ -170,11 +170,13 @@ export default function Responsibles() {
             ))}
         </ul>
       )}
-      <ModalResponsibleInfoComponent
-        isModalResponsibleInfoOpen={isModalOpen}
-        setIsModalResponsibleInfoOpen={setIsModalOpen}
-        responsibleInfo={selectedResponsible}
-      />
+      {selectedResponsible && (
+        <ModalResponsibleInfoComponent
+          isModalResponsibleInfoOpen={isModalOpen}
+          setIsModalResponsibleInfoOpen={setIsModalOpen}
+          responsibleInfo={selectedResponsible}
+        />
+      )}
     </div>
   );
 }
