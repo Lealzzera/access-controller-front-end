@@ -4,7 +4,7 @@ import CardInfoComponent from '@/app/components/CardInfoComponent/CardInfoCompon
 import style from './style.module.css';
 import { useUser } from '@/app/context/userContext';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getChildrenList } from '@/app/actions/getChildrenList';
+import { getChildrenPaginated } from '@/app/actions/getChildrenPaginated';
 import { CircularProgress } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
@@ -30,9 +30,10 @@ type ChildrenDataType = {
 export default function HomePage() {
   const { userInfo } = useUser();
   const [childrenData, setChildrenData] = useState<ChildrenDataType[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentCursor, setCurrentCursor] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [openModalChildInfo, setOpenModalChildInfo] = useState(false);
   const [childInfo, setChildInfo] = useState<any>(undefined);
 
@@ -43,68 +44,67 @@ export default function HomePage() {
     setChildInfo(cardInfo);
   };
 
-  const lastCardRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage(currentPage + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
-  const getChildrenListByUserId = useCallback(
-    async (page: number) => {
+  const fetchChildren = useCallback(
+    async (cursor: string, isInitial: boolean) => {
       if (!userInfo) return;
-      setLoading(true);
-      const response = await getChildrenList({
-        userInfo: {
-          id: userInfo.id,
-          role: userInfo.role,
-        },
-        page,
-      });
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
 
-      if (!response || response.length === 0) {
-        setHasMore(false);
-        setLoading(false);
-        return;
-      }
+      try {
+        const result = await getChildrenPaginated({ institutionId: userInfo.id, cursor, take: 20 });
 
-      setChildrenData((prev) => {
-        const existingIds = new Set(prev.map((child) => child.id));
-        const newItems = response.filter((child: ChildrenDataType) => !existingIds.has(child.id));
+        if (!result || result.status || !result.children) {
+          setHasMore(false);
+          if (isInitial) setLoading(false);
+          else setLoadingMore(false);
+          return;
+        }
 
-        return [...prev, ...newItems];
-      });
-
-      if (response.length < 10) {
+        setChildrenData((prev) => (isInitial ? result.children : [...prev, ...result.children]));
+        setCurrentCursor(result.nextCursor ?? '');
+        setHasMore(!!result.nextCursor);
+      } catch {
         setHasMore(false);
       }
-      setLoading(false);
+
+      if (isInitial) setLoading(false);
+      else setLoadingMore(false);
     },
     [userInfo]
   );
 
   useEffect(() => {
-    if (userInfo && hasMore && !loading) {
-      getChildrenListByUserId(currentPage);
-    }
-  }, [userInfo, currentPage, hasMore]);
+    if (userInfo) fetchChildren('', true);
+  }, [userInfo, fetchChildren]);
+
+  const lastCardRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading || loadingMore) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchChildren(currentCursor, false);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, loadingMore, hasMore, currentCursor, fetchChildren]
+  );
 
   return (
     <>
+      <div className={style.filterContainer}>
+        <ButtonComponent buttonText="Presentes" />
+        <ButtonComponent buttonText="Ausentes" />
+      </div>
       <ModalChildInfoComponent
         isModalChildInfoOpen={openModalChildInfo}
         setIsModalChildInfoOpen={setOpenModalChildInfo}
         childInfo={childInfo}
       />
-      {childrenData.length === 0 && loading && (
+      {loading && childrenData.length === 0 && (
         <div className={style.container}>
           <Skeleton variant="rounded" className={style.skeletonComponent} />
           <Skeleton variant="rounded" className={style.skeletonComponent} />
@@ -115,14 +115,11 @@ export default function HomePage() {
         </div>
       )}
       <section className={style.container}>
-        {childrenData.length === 0 &&
-          !loading &&
-          loading !== undefined &&
-          userInfo?.role === Role.INSTITUTION && (
-            <div className={style.noChildrenData}>
-              <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
-            </div>
-          )}
+        {childrenData.length === 0 && !loading && userInfo?.role === Role.INSTITUTION && (
+          <div className={style.noChildrenData}>
+            <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
+          </div>
+        )}
         {!childrenData.length && !loading && userInfo?.role === Role.RESPONSIBLE && (
           <div className={style.noChildrenData}>
             <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
@@ -148,7 +145,7 @@ export default function HomePage() {
               </div>
             );
           })}
-        {loading && childrenData.length > 0 && (
+        {loadingMore && childrenData.length > 0 && (
           <div className={style.circularProgressContainer}>
             <CircularProgress className={style.circularProgress} />
           </div>

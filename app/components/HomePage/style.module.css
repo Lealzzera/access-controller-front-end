@@ -11,6 +11,17 @@
   padding-top: 1rem;
 }
 
+.filterContainer {
+  display: flex;
+  gap: 1rem;
+  max-width: 320px;
+  margin: 0 auto;
+  align-items: center;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  width: 90vw;
+}
+
 .containerCard {
   width: 300px;
 }
