@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './style.module.css';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { ArrowBackRounded } from '@mui/icons-material';
 import { differenceInYears } from 'date-fns';
 import Image from 'next/image';
 import { getResponsibleListByChildId } from '@/app/actions/getResponsibleListByChildId';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import { useUser } from '@/app/context/userContext';
-import cleanCpfNumber from '@/app/helpers/cleanCpfNumber';
-import { Role } from '@/app/enums/Role.enum';
 
 type ModalChildInfoComponentProps = {
   isModalChildInfoOpen: boolean;
@@ -22,6 +21,7 @@ type ResponsibleObject = {
   kinship: string;
   name: string;
   picture: string;
+  phoneNumber: string;
 };
 
 export default function ModalChildInfoComponent({
@@ -32,16 +32,22 @@ export default function ModalChildInfoComponent({
   const [childAge, setChildAge] = useState('');
   const [loading, setLoading] = useState(false);
   const [childResponsibles, setChildResponsibles] = useState([]);
+  const [showResponsibleDetails, setShowResponsibleDetails] = useState(false);
+  const [responsibleDetais, setResponsibleDetails] = useState<ResponsibleObject | null>(null);
   const modalRef = useRef(null);
-  const { userInfo, setRegisterResponsibleModalOpen, setLastChildRegisteredInformation } =
-    useUser();
 
   const handleCloseModal = () => {
     setIsModalChildInfoOpen(false);
+    setShowResponsibleDetails(false);
   };
 
   const handleCloseClickingOutside = (event: any) => {
     if (event.target === modalRef.current) handleCloseModal();
+  };
+
+  const handleBack = () => {
+    setShowResponsibleDetails(false);
+    setResponsibleDetails(null);
   };
 
   const generateChildAge = () => {
@@ -52,15 +58,25 @@ export default function ModalChildInfoComponent({
     setChildAge(String(age));
   };
 
-  const handleOpenRegisterResponsibleModal = () => {
-    handleCloseModal();
-    const cleanedCpf = cleanCpfNumber(childInfo.cpf);
-    setLastChildRegisteredInformation({
-      cpf: cleanedCpf,
-      name: childInfo.name,
-      id: childInfo.id,
+  const handleShowResponsibleDetails = ({
+    cpf,
+    email,
+    id,
+    kinship,
+    name,
+    phoneNumber,
+    picture,
+  }: ResponsibleObject) => {
+    setShowResponsibleDetails(true);
+    setResponsibleDetails({
+      cpf,
+      email,
+      id,
+      name,
+      phoneNumber,
+      picture,
+      kinship,
     });
-    setRegisterResponsibleModalOpen(true);
   };
 
   useEffect(() => {
@@ -81,14 +97,26 @@ export default function ModalChildInfoComponent({
       {isModalChildInfoOpen && (
         <div onClick={handleCloseClickingOutside} ref={modalRef} className={style.modalBg}>
           <div className={style.modalBody}>
-            <div className={style.closeButtonContainer}>
-              <CloseRoundedIcon
-                onClick={handleCloseModal}
-                fontSize="large"
-                className={style.closeIcon}
-              />
+            <div className={style.modalButtonsContainer}>
+              {showResponsibleDetails && (
+                <div>
+                  <ArrowBackRounded
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleBack}
+                    fontSize="large"
+                  />
+                </div>
+              )}
+              <div className={style.closeButtonContainer}>
+                <CloseRoundedIcon
+                  onClick={handleCloseModal}
+                  fontSize="large"
+                  className={style.closeIcon}
+                />
+              </div>
             </div>
-            {childInfo && (
+
+            {childInfo && !showResponsibleDetails && (
               <>
                 <div className={style.modalContent}>
                   <div className={style.imgContainer}>
@@ -125,17 +153,6 @@ export default function ModalChildInfoComponent({
                 </div>
                 <div className={style.responsibleListContainer}>
                   <h1 className={style.childName}>Responsáveis</h1>
-                  {childResponsibles.length === 0 && (
-                    <div className={style.notFoundResponsibles}>
-                      <p>Não há responsáveis cadastrados.</p>
-                      <div className={style.registerResponsibleButton}>
-                        <ButtonComponent
-                          onClick={handleOpenRegisterResponsibleModal}
-                          buttonText="Cadastrar"
-                        />
-                      </div>
-                    </div>
-                  )}
                   {childResponsibles.length > 0 && !loading && (
                     <ul className={style.responsiblesContainer}>
                       {childResponsibles.map((responsible: ResponsibleObject) => (
@@ -165,33 +182,58 @@ export default function ModalChildInfoComponent({
                                 <span>Telefone: </span> 11-95506-0047
                               </p>
                             </div>
-                            <div className={style.infoButtonContainer}>
-                              <ButtonComponent buttonText="Detalhes" />
-                            </div>
+                            {/* <div className={style.infoButtonContainer}>
+                              <ButtonComponent
+                                buttonText="Detalhes"
+                                onClick={() =>
+                                  handleShowResponsibleDetails({
+                                    cpf: responsible.cpf,
+                                    email: responsible.email,
+                                    id: responsible.id,
+                                    name: responsible.name,
+                                    phoneNumber: responsible.phoneNumber,
+                                    picture: responsible.picture,
+                                    kinship: responsible.kinship,
+                                  })
+                                }
+                              />
+                            </div> */}
                           </div>
                         </li>
                       ))}
-                      {userInfo?.role === Role.INSTITUTION && (
-                        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                          <ButtonComponent
-                            onClick={handleOpenRegisterResponsibleModal}
-                            buttonText="Novo Responsável"
-                            style={{
-                              fontSize: '1rem',
-                              textTransform: 'none',
-                              backgroundColor: '#a8d0db',
-                              boxShadow: 'none',
-                              fontWeight: 'bold',
-                              color: '#044b7f',
-                              width: '265px',
-                            }}
-                          />
-                        </div>
-                      )}
                     </ul>
                   )}
                 </div>
               </>
+            )}
+            {showResponsibleDetails && responsibleDetais && (
+              <div className={style.responsibleDetailsContainer}>
+                <h1 className={style.responsibleDetailsHeader}>Detalhes do Responsável</h1>
+                <div className={style.responsibleDetailsImgContainer}>
+                  <Image
+                    src={responsibleDetais.picture}
+                    width={600}
+                    height={600}
+                    className={style.responsibleDetailsImg}
+                    alt={responsibleDetais.name}
+                  />
+                </div>
+                <h2 className={style.responsibleDetailsName}>{responsibleDetais.name}</h2>
+                <div className={style.responsibleDetailsStats}>
+                  <p>
+                    <span>Parentesco: </span> {responsibleDetais.kinship}
+                  </p>
+                  <p>
+                    <span>Email: </span> {responsibleDetais.email}
+                  </p>
+                  <p>
+                    <span>CPF: </span> {responsibleDetais.cpf}
+                  </p>
+                  <p>
+                    <span>Telefone: </span> {responsibleDetais.phoneNumber}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         </div>

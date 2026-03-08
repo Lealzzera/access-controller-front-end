@@ -5,11 +5,15 @@ import style from './style.module.css';
 import { useUser } from '@/app/context/userContext';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getChildrenPaginated } from '@/app/actions/getChildrenPaginated';
+import { getChildrenListByResponsibleId } from '@/app/actions/getChildrenListByResposnibleId';
+import { createSolicitation } from '@/app/actions/createSolicitation';
 import { CircularProgress } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import ModalChildInfoComponent from '../ModalChildInfoComponent/ModalChildInfoComponent';
 import { Role } from '@/app/enums/Role.enum';
+import { useSocket } from '@/app/hooks/useSocket';
+import { toast } from 'react-toastify';
 
 type ChildrenDataType = {
   id: string;
@@ -36,6 +40,9 @@ export default function HomePage() {
   const [hasMore, setHasMore] = useState(true);
   const [openModalChildInfo, setOpenModalChildInfo] = useState(false);
   const [childInfo, setChildInfo] = useState<any>(undefined);
+  const [solicitingIds, setSolicitingIds] = useState<string[]>([]);
+
+  const { onSolicitationAccepted, onSolicitationRejected } = useSocket();
 
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -44,7 +51,46 @@ export default function HomePage() {
     setChildInfo(cardInfo);
   };
 
-  const fetchChildren = useCallback(
+  const handleSolicitation = async (childId: string, type: 'DROP_OFF' | 'PICK_UP') => {
+    setSolicitingIds((prev) => [...prev, childId]);
+    try {
+      const result = await createSolicitation({ type, childId });
+      if (result?.status && result.status >= 400) {
+        toast.error('Erro ao enviar solicitação.');
+      } else {
+        toast.success('Solicitação enviada! Aguarde a resposta da escola.');
+      }
+    } catch {
+      toast.error('Erro ao enviar solicitação.');
+    }
+    setSolicitingIds((prev) => prev.filter((id) => id !== childId));
+  };
+
+  useEffect(() => {
+    const unsubAccepted = onSolicitationAccepted((data) => {
+      const message =
+        data.type === 'DROP_OFF'
+          ? `${data.child.name} foi recebida pela escola!`
+          : `${data.child.name} foi liberada para você!`;
+      toast.success(message);
+      setChildrenData((prev) =>
+        prev.map((c) =>
+          c.id === data.child.id ? { ...c, isPresent: data.type === 'DROP_OFF' } : c
+        )
+      );
+    });
+
+    const unsubRejected = onSolicitationRejected((data) => {
+      toast.error(`Solicitação para ${data.child.name} foi rejeitada pela escola.`);
+    });
+
+    return () => {
+      unsubAccepted();
+      unsubRejected();
+    };
+  }, [onSolicitationAccepted, onSolicitationRejected]);
+
+  const fetchInstitutionChildren = useCallback(
     async (cursor: string, isInitial: boolean) => {
       if (!userInfo) return;
       if (isInitial) setLoading(true);
@@ -73,9 +119,29 @@ export default function HomePage() {
     [userInfo]
   );
 
+  const fetchResponsibleChildren = useCallback(async () => {
+    if (!userInfo) return;
+    setLoading(true);
+    try {
+      const children = await getChildrenListByResponsibleId(userInfo.id);
+      if (Array.isArray(children)) {
+        setChildrenData(children);
+      }
+    } catch {
+      setChildrenData([]);
+    }
+    setLoading(false);
+    setHasMore(false);
+  }, [userInfo]);
+
   useEffect(() => {
-    if (userInfo) fetchChildren('', true);
-  }, [userInfo, fetchChildren]);
+    if (!userInfo) return;
+    if (userInfo.role === Role.INSTITUTION) {
+      fetchInstitutionChildren('', true);
+    } else {
+      fetchResponsibleChildren();
+    }
+  }, [userInfo, fetchInstitutionChildren, fetchResponsibleChildren]);
 
   const lastCardRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -84,21 +150,21 @@ export default function HomePage() {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          fetchChildren(currentCursor, false);
+          fetchInstitutionChildren(currentCursor, false);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, loadingMore, hasMore, currentCursor, fetchChildren]
+    [loading, loadingMore, hasMore, currentCursor, fetchInstitutionChildren]
   );
 
   return (
     <>
-      <div className={style.filterContainer}>
+      {/* <div className={style.filterContainer}>
         <ButtonComponent buttonText="Presentes" />
         <ButtonComponent buttonText="Ausentes" />
-      </div>
+      </div> */}
       <ModalChildInfoComponent
         isModalChildInfoOpen={openModalChildInfo}
         setIsModalChildInfoOpen={setOpenModalChildInfo}
@@ -128,6 +194,7 @@ export default function HomePage() {
         {childrenData.length > 0 &&
           childrenData.map((child, index) => {
             const isLastCard = index === childrenData.length - 1;
+            const isSoliciting = solicitingIds.includes(child.id);
             return (
               <div
                 key={child.id}
@@ -142,6 +209,27 @@ export default function HomePage() {
                   grade={child.grade.name}
                   pictureUrl={child.picture}
                 />
+                {userInfo?.role === Role.RESPONSIBLE && (
+                  <div className={style.solicitationButtons}>
+                    {!child.isPresent ? (
+                      <button
+                        className={style.dropOffButton}
+                        disabled={isSoliciting}
+                        onClick={() => handleSolicitation(child.id, 'DROP_OFF')}
+                      >
+                        {isSoliciting ? 'Enviando...' : 'Deixar na escola'}
+                      </button>
+                    ) : (
+                      <button
+                        className={style.pickUpButton}
+                        disabled={isSoliciting}
+                        onClick={() => handleSolicitation(child.id, 'PICK_UP')}
+                      >
+                        {isSoliciting ? 'Enviando...' : 'Buscar criança'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

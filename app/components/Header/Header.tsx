@@ -36,6 +36,10 @@ export default function Header() {
     handleCloseMenu();
   };
 
+  const handlePushToHome = () => {
+    router.push('/home');
+  };
+
   const handleDirectToChildrenList = () => {
     router.push('/children');
     handleCloseMenu();
@@ -46,13 +50,20 @@ export default function Header() {
     handleCloseMenu();
   };
 
+  const handleDirectToRequests = () => {
+    router.push('/requests');
+    handleCloseMenu();
+  };
+
   useEffect(() => {
     setUserName(userInfo?.userInfo.name);
   }, [userInfo]);
   return (
     <header className={style.headerContainer}>
       <div className={style.wrappedContent}>
-        <span>{userName}</span>
+        <span style={{ cursor: 'pointer' }} onClick={handlePushToHome}>
+          {userName}
+        </span>
         {userInfo?.role === Role.INSTITUTION && (
           <div className={style.containerMenu}>
             <button className={style.buttonMenu} onClick={handleClick}>
@@ -61,7 +72,7 @@ export default function Header() {
             <Menu onClose={handleCloseMenu} id="basic-menu" open={open} anchorEl={anchorEl}>
               <MenuItem onClick={handleDirectToChildrenList}>Lista de crianças</MenuItem>
               <MenuItem onClick={handleDirectToResponsiblesList}>Lista de responsáveis</MenuItem>
-              <MenuItem onClick={handleDirectToSettings}>Configurações</MenuItem>
+              <MenuItem onClick={handleDirectToRequests}>Solicitações</MenuItem>
               <MenuItem onClick={logoutFunction}>Sair</MenuItem>
             </Menu>
           </div>
