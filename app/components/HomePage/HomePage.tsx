@@ -41,9 +41,11 @@ export default function HomePage() {
   const [openModalChildInfo, setOpenModalChildInfo] = useState(false);
   const [childInfo, setChildInfo] = useState<any>(undefined);
   const [solicitingIds, setSolicitingIds] = useState<string[]>([]);
+  const [cooldownIds, setCooldownIds] = useState<string[]>([]);
 
   const { onSolicitationAccepted, onSolicitationRejected } = useSocket();
 
+  const cooldownTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleOpenCard = (cardInfo: ChildrenDataType) => {
@@ -51,7 +53,29 @@ export default function HomePage() {
     setChildInfo(cardInfo);
   };
 
+  const startCooldown = (childId: string) => {
+    setCooldownIds((prev) => [...prev, childId]);
+    const timer = setTimeout(
+      () => {
+        setCooldownIds((prev) => prev.filter((id) => id !== childId));
+        cooldownTimers.current.delete(childId);
+      },
+      5 * 60 * 1000
+    );
+    cooldownTimers.current.set(childId, timer);
+  };
+
+  useEffect(() => {
+    return () => {
+      cooldownTimers.current.forEach((timer) => clearTimeout(timer));
+    };
+  }, []);
+
   const handleSolicitation = async (childId: string, type: 'DROP_OFF' | 'PICK_UP') => {
+    if (cooldownIds.includes(childId)) {
+      toast.warn('Aguarde 5 minutos para enviar outra solicitação para esta criança.');
+      return;
+    }
     setSolicitingIds((prev) => [...prev, childId]);
     try {
       const result = await createSolicitation({ type, childId });
@@ -59,6 +83,7 @@ export default function HomePage() {
         toast.error('Erro ao enviar solicitação.');
       } else {
         toast.success('Solicitação enviada! Aguarde a resposta da escola.');
+        startCooldown(childId);
       }
     } catch {
       toast.error('Erro ao enviar solicitação.');
@@ -195,6 +220,7 @@ export default function HomePage() {
           childrenData.map((child, index) => {
             const isLastCard = index === childrenData.length - 1;
             const isSoliciting = solicitingIds.includes(child.id);
+            const isOnCooldown = cooldownIds.includes(child.id);
             return (
               <div
                 key={child.id}
@@ -214,18 +240,26 @@ export default function HomePage() {
                     {!child.isPresent ? (
                       <button
                         className={style.dropOffButton}
-                        disabled={isSoliciting}
+                        disabled={isSoliciting || isOnCooldown}
                         onClick={() => handleSolicitation(child.id, 'DROP_OFF')}
                       >
-                        {isSoliciting ? 'Enviando...' : 'Deixar na escola'}
+                        {isSoliciting
+                          ? 'Enviando...'
+                          : isOnCooldown
+                            ? 'Aguarde...'
+                            : 'Deixar na escola'}
                       </button>
                     ) : (
                       <button
                         className={style.pickUpButton}
-                        disabled={isSoliciting}
+                        disabled={isSoliciting || isOnCooldown}
                         onClick={() => handleSolicitation(child.id, 'PICK_UP')}
                       >
-                        {isSoliciting ? 'Enviando...' : 'Buscar criança'}
+                        {isSoliciting
+                          ? 'Enviando...'
+                          : isOnCooldown
+                            ? 'Aguarde...'
+                            : 'Buscar criança'}
                       </button>
                     )}
                   </div>
