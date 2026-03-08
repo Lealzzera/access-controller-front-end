@@ -41,6 +41,11 @@ export default function Header() {
     handleCloseMenu();
   };
 
+  const handleDirectToSettings = () => {
+    router.push('/settings');
+    handleCloseMenu();
+  };
+
   useEffect(() => {
     setUserName(userInfo?.userInfo.name);
   }, [userInfo]);
@@ -56,6 +61,7 @@ export default function Header() {
             <Menu onClose={handleCloseMenu} id="basic-menu" open={open} anchorEl={anchorEl}>
               <MenuItem onClick={handleDirectToChildrenList}>Lista de crianças</MenuItem>
               <MenuItem onClick={handleDirectToResponsiblesList}>Lista de responsáveis</MenuItem>
+              <MenuItem onClick={handleDirectToSettings}>Configurações</MenuItem>
               <MenuItem onClick={logoutFunction}>Sair</MenuItem>
             </Menu>
           </div>
