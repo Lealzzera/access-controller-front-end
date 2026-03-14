@@ -19,9 +19,6 @@ import ModalCameraComponent from '../ModalCameraComponent/ModalCameraComponent';
 import compressFile from '@/app/helpers/compressFile';
 import { registerChild } from '@/app/actions/registerChild';
 import { getResponsiblesPaginated } from '@/app/actions/getResponsiblesPaginated';
-import { getPreSignedUploadURL } from '@/app/actions/getPreSignedUploadURL';
-import { updateChild } from '@/app/actions/updateChild';
-import postPictureToS3 from '@/app/actions/postPictureToS3';
 import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import { handleStartCamera } from '@/app/helpers/handleStartCamera';
@@ -163,7 +160,7 @@ export default function ModalRegisterChildComponent({
       const [gradeResponse, periodResponse, responsibleResponse] = await Promise.all([
         getGradesByInstituionId(userInfo?.id),
         getPeriodsByInstituionId(userInfo.id),
-        getResponsiblesPaginated({ cursor: '', take: 100 }),
+        getResponsiblesPaginated({ institutionId: userInfo.id, cursor: '', take: 100 }),
       ]);
       setGradeOptions(gradeResponse);
       setPeriodOptions(periodResponse);

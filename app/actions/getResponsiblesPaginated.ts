@@ -3,14 +3,19 @@
 import { apiClient } from './apiClient';
 
 type ResposniblesPaginatedType = {
+  institutionId: string;
   cursor?: string;
   take?: number;
 };
 
-export async function getResponsiblesPaginated({ cursor, take }: ResposniblesPaginatedType) {
+export async function getResponsiblesPaginated({
+  institutionId,
+  cursor,
+  take,
+}: ResposniblesPaginatedType) {
   try {
     const response = await apiClient({
-      path: `/responsible?cursor=${cursor}&take=${take}`,
+      path: `/responsible?institutionId=${institutionId}&cursor=${cursor}&take=${take}`,
       method: 'GET',
     });
 

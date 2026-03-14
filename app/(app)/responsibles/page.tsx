@@ -9,6 +9,7 @@ import { getResponsiblesPaginated } from '@/app/actions/getResponsiblesPaginated
 import { Responsible } from '@/app/types/responsible.type';
 import CardInfoResponsibleComponent from '@/app/components/CardInfoResponsibleComponent/CardInfoResponsibleComponent';
 import Skeleton from '@mui/material/Skeleton';
+import { useUser } from '@/app/context/userContext';
 
 export default function Responsibles() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +21,7 @@ export default function Responsibles() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
+  const { userInfo } = useUser();
 
   const handleOpenModalForNewResponsible = () => {
     setIsRegisterModalOpen(true);
@@ -30,21 +32,29 @@ export default function Responsibles() {
     setIsModalOpen(true);
   };
 
-  const fetchResponsibles = useCallback(async (cursor: string, isInitial: boolean) => {
-    if (isInitial) setLoading(true);
-    else setLoadingMore(true);
+  const fetchResponsibles = useCallback(
+    async (cursor: string, isInitial: boolean) => {
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
+      if (!userInfo?.id) return;
 
-    const result = await getResponsiblesPaginated({ cursor, take: 20 });
+      const result = await getResponsiblesPaginated({
+        institutionId: userInfo.id,
+        cursor,
+        take: 20,
+      });
 
-    setResponsibles((prev) =>
-      isInitial ? result.responsibles : [...prev, ...result.responsibles]
-    );
-    setCurrentCursor(result.nextCursor ?? '');
-    setHasMore(!!result.nextCursor);
+      setResponsibles((prev) =>
+        isInitial ? result.responsibles : [...prev, ...result.responsibles]
+      );
+      setCurrentCursor(result.nextCursor ?? '');
+      setHasMore(!!result.nextCursor);
 
-    if (isInitial) setLoading(false);
-    else setLoadingMore(false);
-  }, []);
+      if (isInitial) setLoading(false);
+      else setLoadingMore(false);
+    },
+    [userInfo]
+  );
 
   useEffect(() => {
     fetchResponsibles('', true);
