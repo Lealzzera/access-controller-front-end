@@ -20,6 +20,17 @@ export type SolicitationData = {
   };
 };
 
+export type ArrivalAlertData = {
+  minutes: 'MINUTES_30' | 'MINUTES_15';
+  childId: string;
+  responsibleId: string;
+  child: {
+    id: string;
+    name: string;
+    picture: string | null;
+  };
+};
+
 export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
   const [connected, setConnected] = useState(false);
@@ -77,10 +88,18 @@ export function useSocket() {
     };
   };
 
+  const onArrivalAlert = (callback: (data: ArrivalAlertData) => void) => {
+    socketRef.current?.on('arrival-alert', callback);
+    return () => {
+      socketRef.current?.off('arrival-alert', callback);
+    };
+  };
+
   return {
     connected,
     onNewSolicitation,
     onSolicitationAccepted,
     onSolicitationRejected,
+    onArrivalAlert,
   };
 }

@@ -7,9 +7,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getChildrenPaginated } from '@/app/actions/getChildrenPaginated';
 import { getChildrenListByResponsibleId } from '@/app/actions/getChildrenListByResposnibleId';
 import { createSolicitation } from '@/app/actions/createSolicitation';
+import { sendArrivalAlert } from '@/app/actions/sendArrivalAlert';
 import { CircularProgress } from '@mui/material';
 import { Skeleton } from '@mui/material';
-import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import ModalChildInfoComponent from '../ModalChildInfoComponent/ModalChildInfoComponent';
 import { Role } from '@/app/enums/Role.enum';
 import { useSocket } from '@/app/hooks/useSocket';
@@ -20,16 +20,15 @@ type ChildrenDataType = {
   name: string;
   cpf: string;
   isPresent: boolean;
-  period: {
-    id: string;
-    name: string;
-  };
-  grade: {
-    id: string;
-    name: string;
-  };
+  period: { id: string; name: string };
+  grade: { id: string; name: string };
   picture: string;
 };
+
+type ActiveFilter = 'all' | 'present' | 'absent';
+
+// Estado de aviso de chegada por criança
+type ArrivalState = 'none' | 'MINUTES_30' | 'MINUTES_15';
 
 export default function HomePage() {
   const { userInfo } = useUser();
@@ -40,11 +39,18 @@ export default function HomePage() {
   const [hasMore, setHasMore] = useState(true);
   const [openModalChildInfo, setOpenModalChildInfo] = useState(false);
   const [childInfo, setChildInfo] = useState<any>(undefined);
+  const [activeFilter, setActiveFilter] = useState<ActiveFilter>('all');
+
+  // Estados de solicitação real
   const [solicitingIds, setSolicitingIds] = useState<string[]>([]);
   const [cooldownIds, setCooldownIds] = useState<string[]>([]);
 
-  const { onSolicitationAccepted, onSolicitationRejected } = useSocket();
+  // Estado dos avisos de chegada: childId → 'none' | 'MINUTES_30' | 'MINUTES_15'
+  const [arrivalStates, setArrivalStates] = useState<Record<string, ArrivalState>>({});
+  // IDs onde o alerta está sendo enviado
+  const [alertingIds, setAlertingIds] = useState<string[]>([]);
 
+  const { onSolicitationAccepted, onSolicitationRejected } = useSocket();
   const cooldownTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -71,6 +77,25 @@ export default function HomePage() {
     };
   }, []);
 
+  // ── Alerta de chegada (30 ou 15 min) ──────────────────────────────────────
+  const handleArrivalAlert = async (childId: string, minutes: 'MINUTES_30' | 'MINUTES_15') => {
+    setAlertingIds((prev) => [...prev, childId]);
+    try {
+      const result = await sendArrivalAlert({ minutes, childId });
+      if (result?.status >= 400) {
+        toast.error('Erro ao enviar aviso.');
+      } else {
+        setArrivalStates((prev) => ({ ...prev, [childId]: minutes }));
+        const label = minutes === 'MINUTES_30' ? '30 minutos' : '15 minutos';
+        toast.info(`Aviso enviado: chego em ${label}.`);
+      }
+    } catch {
+      toast.error('Erro ao enviar aviso.');
+    }
+    setAlertingIds((prev) => prev.filter((id) => id !== childId));
+  };
+
+  // ── Solicitação real (PICK_UP) ────────────────────────────────────────────
   const handleSolicitation = async (childId: string, type: 'DROP_OFF' | 'PICK_UP') => {
     if (cooldownIds.includes(childId)) {
       toast.warn('Aguarde 5 minutos para enviar outra solicitação para esta criança.');
@@ -84,6 +109,8 @@ export default function HomePage() {
       } else {
         toast.success('Solicitação enviada! Aguarde a resposta da escola.');
         startCooldown(childId);
+        // limpa o estado de aviso de chegada após enviar a solicitação real
+        setArrivalStates((prev) => ({ ...prev, [childId]: 'none' }));
       }
     } catch {
       toast.error('Erro ao enviar solicitação.');
@@ -115,14 +142,26 @@ export default function HomePage() {
     };
   }, [onSolicitationAccepted, onSolicitationRejected]);
 
+  const filterToActive = (filter: ActiveFilter): boolean | undefined => {
+    if (filter === 'present') return true;
+    if (filter === 'absent') return false;
+    return undefined;
+  };
+
   const fetchInstitutionChildren = useCallback(
-    async (cursor: string, isInitial: boolean) => {
+    async (cursor: string, isInitial: boolean, filter: ActiveFilter = 'all') => {
       if (!userInfo) return;
       if (isInitial) setLoading(true);
       else setLoadingMore(true);
 
       try {
-        const result = await getChildrenPaginated({ institutionId: userInfo.id, cursor, take: 20 });
+        const active = filterToActive(filter);
+        const result = await getChildrenPaginated({
+          institutionId: userInfo.id,
+          cursor,
+          take: 20,
+          active,
+        });
 
         if (!result || result.status || !result.children) {
           setHasMore(false);
@@ -162,11 +201,19 @@ export default function HomePage() {
   useEffect(() => {
     if (!userInfo) return;
     if (userInfo.role === Role.INSTITUTION) {
-      fetchInstitutionChildren('', true);
+      fetchInstitutionChildren('', true, activeFilter);
     } else {
       fetchResponsibleChildren();
     }
   }, [userInfo, fetchInstitutionChildren, fetchResponsibleChildren]);
+
+  const handleFilterChange = (filter: ActiveFilter) => {
+    if (filter === activeFilter) return;
+    setActiveFilter(filter);
+    setCurrentCursor('');
+    setHasMore(true);
+    fetchInstitutionChildren('', true, filter);
+  };
 
   const lastCardRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -175,21 +222,39 @@ export default function HomePage() {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          fetchInstitutionChildren(currentCursor, false);
+          fetchInstitutionChildren(currentCursor, false, activeFilter);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, loadingMore, hasMore, currentCursor, fetchInstitutionChildren]
+    [loading, loadingMore, hasMore, currentCursor, activeFilter, fetchInstitutionChildren]
   );
 
   return (
     <>
-      {/* <div className={style.filterContainer}>
-        <ButtonComponent buttonText="Presentes" />
-        <ButtonComponent buttonText="Ausentes" />
-      </div> */}
+      {userInfo?.role === Role.INSTITUTION && (
+        <div className={style.filterContainer}>
+          <button
+            className={`${style.filterButton} ${activeFilter === 'all' ? style.filterButtonActive : ''}`}
+            onClick={() => handleFilterChange('all')}
+          >
+            Todos
+          </button>
+          <button
+            className={`${style.filterButton} ${activeFilter === 'present' ? style.filterButtonActive : ''}`}
+            onClick={() => handleFilterChange('present')}
+          >
+            Presentes
+          </button>
+          <button
+            className={`${style.filterButton} ${activeFilter === 'absent' ? style.filterButtonActive : ''}`}
+            onClick={() => handleFilterChange('absent')}
+          >
+            Ausentes
+          </button>
+        </div>
+      )}
       <ModalChildInfoComponent
         isModalChildInfoOpen={openModalChildInfo}
         setIsModalChildInfoOpen={setOpenModalChildInfo}
@@ -206,14 +271,15 @@ export default function HomePage() {
         </div>
       )}
       <section className={style.container}>
-        {childrenData.length === 0 && !loading && userInfo?.role === Role.INSTITUTION && (
+        {childrenData.length === 0 && !loading && (
           <div className={style.noChildrenData}>
-            <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
-          </div>
-        )}
-        {!childrenData.length && !loading && userInfo?.role === Role.RESPONSIBLE && (
-          <div className={style.noChildrenData}>
-            <h1 className={style.noChildrenDataTitle}>Não há crianças cadastradas.</h1>
+            <h1 className={style.noChildrenDataTitle}>
+              {activeFilter === 'present'
+                ? 'Nenhuma criança presente no momento.'
+                : activeFilter === 'absent'
+                  ? 'Nenhuma criança ausente no momento.'
+                  : 'Não há crianças cadastradas.'}
+            </h1>
           </div>
         )}
         {childrenData.length > 0 &&
@@ -221,6 +287,10 @@ export default function HomePage() {
             const isLastCard = index === childrenData.length - 1;
             const isSoliciting = solicitingIds.includes(child.id);
             const isOnCooldown = cooldownIds.includes(child.id);
+            const isAlerting = alertingIds.includes(child.id);
+            const arrivalState = arrivalStates[child.id] ?? 'none';
+            const hasPreArrival = arrivalState !== 'none';
+
             return (
               <div
                 key={child.id}
@@ -235,11 +305,32 @@ export default function HomePage() {
                   grade={child.grade.name}
                   pictureUrl={child.picture}
                 />
+
+                {/* Botões só para RESPONSIBLE */}
                 {userInfo?.role === Role.RESPONSIBLE && (
-                  <div className={style.solicitationButtons}>
+                  <div className={style.arrivalButtons}>
+                    {/* Linha 1: avisos de chegada (disponível nos dois estados) */}
+                    <div className={style.alertRow}>
+                      <button
+                        className={`${style.alertButton} ${arrivalState === 'MINUTES_30' ? style.alertButtonActive : ''}`}
+                        disabled={isAlerting || arrivalState === 'MINUTES_30'}
+                        onClick={() => handleArrivalAlert(child.id, 'MINUTES_30')}
+                      >
+                        Chego em 30 min
+                      </button>
+                      <button
+                        className={`${style.alertButton} ${arrivalState === 'MINUTES_15' ? style.alertButtonActive : ''}`}
+                        disabled={isAlerting || arrivalState === 'MINUTES_15'}
+                        onClick={() => handleArrivalAlert(child.id, 'MINUTES_15')}
+                      >
+                        Chego em 15 min
+                      </button>
+                    </div>
+
+                    {/* Linha 2: botão condicional — entrada ou saída */}
                     {!child.isPresent ? (
                       <button
-                        className={style.dropOffButton}
+                        className={`${style.dropOffButton} ${hasPreArrival ? style.arrivedButton : ''}`}
                         disabled={isSoliciting || isOnCooldown}
                         onClick={() => handleSolicitation(child.id, 'DROP_OFF')}
                       >
@@ -247,11 +338,13 @@ export default function HomePage() {
                           ? 'Enviando...'
                           : isOnCooldown
                             ? 'Aguarde...'
-                            : 'Deixar na escola'}
+                            : hasPreArrival
+                              ? 'Cheguei'
+                              : 'Solicitar entrada'}
                       </button>
                     ) : (
                       <button
-                        className={style.pickUpButton}
+                        className={`${style.pickUpButton} ${hasPreArrival ? style.arrivedButton : ''}`}
                         disabled={isSoliciting || isOnCooldown}
                         onClick={() => handleSolicitation(child.id, 'PICK_UP')}
                       >
@@ -259,9 +352,28 @@ export default function HomePage() {
                           ? 'Enviando...'
                           : isOnCooldown
                             ? 'Aguarde...'
-                            : 'Buscar criança'}
+                            : hasPreArrival
+                              ? 'Cheguei'
+                              : 'Buscar criança'}
                       </button>
                     )}
+                  </div>
+                )}
+
+                {/* Botão buscar para RESPONSIBLE em crianças presentes */}
+                {userInfo?.role === Role.RESPONSIBLE && child.isPresent && (
+                  <div className={style.solicitationButtons}>
+                    <button
+                      className={style.pickUpButton}
+                      disabled={isSoliciting || isOnCooldown}
+                      onClick={() => handleSolicitation(child.id, 'PICK_UP')}
+                    >
+                      {isSoliciting
+                        ? 'Enviando...'
+                        : isOnCooldown
+                          ? 'Aguarde...'
+                          : 'Buscar criança'}
+                    </button>
                   </div>
                 )}
               </div>

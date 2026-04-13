@@ -1,0 +1,33 @@
+.input {
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--gray-600);
+  background-color: var(--white);
+  font-family: var(--main-font-sans);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.input.error {
+  border-color: red;
+}
+
+.input:focus {
+  outline: 2px solid var(--blue-400);
+  border: 1px solid var(--blue-400);
+}
+
+.label {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  font-family: var(--main-font-sans);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.required::after {
+  content: '*';
+  color: var(--red-600);
+}

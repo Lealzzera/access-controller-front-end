@@ -1,14 +1,17 @@
-import { InputProps } from '@mui/material';
-import { InputField, InputLabel } from './styles';
+import React from 'react';
+import inputStyle from './InputFieldComponent.module.css';
 
-interface InputFieldComponentProps extends InputProps {
-  inputType: 'text' | 'email' | 'password';
+interface InputFieldComponentProps {
+  inputType?: 'text' | 'email' | 'password';
   inputValue: string;
   idInput: string;
   inputLabel: string;
   setInputValue: (value: string) => void;
   showError?: boolean;
   required?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+  style?: React.CSSProperties;
 }
 
 export default function InputFieldComponent({
@@ -19,21 +22,27 @@ export default function InputFieldComponent({
   setInputValue,
   showError,
   required,
-  ...props
+  disabled,
+  placeholder,
+  style,
 }: InputFieldComponentProps) {
   return (
     <div>
-      <InputLabel className={required ? 'required' : ''} htmlFor={idInput}>
+      <label
+        className={`${inputStyle.label} ${required ? inputStyle.required : ''}`}
+        htmlFor={idInput}
+      >
         {inputLabel}
-      </InputLabel>
-      {/* TODO: CHANGE THIS INPUT TO A NORMAL INPUT REMOVING THE STYLED COMPONENTS */}
-      <InputField
-        {...props}
-        className={showError ? 'error' : ''}
+      </label>
+      <input
+        className={`${inputStyle.input} ${showError ? inputStyle.error : ''}`}
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
         type={inputType}
         id={idInput}
+        disabled={disabled}
+        placeholder={placeholder}
+        style={style}
       />
     </div>
   );

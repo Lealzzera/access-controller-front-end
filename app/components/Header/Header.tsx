@@ -50,6 +50,11 @@ export default function Header() {
     handleCloseMenu();
   };
 
+  const handleDirectToHistory = () => {
+    router.push('/history');
+    handleCloseMenu();
+  };
+
   const handleDirectToRequests = () => {
     router.push('/requests');
     handleCloseMenu();
@@ -73,6 +78,8 @@ export default function Header() {
               <MenuItem onClick={handleDirectToChildrenList}>Lista de crianças</MenuItem>
               <MenuItem onClick={handleDirectToResponsiblesList}>Lista de responsáveis</MenuItem>
               <MenuItem onClick={handleDirectToRequests}>Solicitações</MenuItem>
+              <MenuItem onClick={handleDirectToHistory}>Histórico</MenuItem>
+              <MenuItem onClick={handleDirectToSettings}>Configurações</MenuItem>
               <MenuItem onClick={logoutFunction}>Sair</MenuItem>
             </Menu>
           </div>

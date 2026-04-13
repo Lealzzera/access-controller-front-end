@@ -179,10 +179,10 @@ export default function ModalChildInfoComponent({
                                 <span>CPF: </span> {responsible.cpf}
                               </p>
                               <p>
-                                <span>Telefone: </span> 11-95506-0047
+                                <span>Telefone: </span> {responsible.phoneNumber || '—'}
                               </p>
                             </div>
-                            {/* <div className={style.infoButtonContainer}>
+                            <div className={style.infoButtonContainer}>
                               <ButtonComponent
                                 buttonText="Detalhes"
                                 onClick={() =>
@@ -197,7 +197,7 @@ export default function ModalChildInfoComponent({
                                   })
                                 }
                               />
-                            </div> */}
+                            </div>
                           </div>
                         </li>
                       ))}

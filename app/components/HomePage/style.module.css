@@ -13,13 +13,43 @@
 
 .filterContainer {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   max-width: 320px;
   margin: 0 auto;
   align-items: center;
-  padding-bottom: 1rem;
-  padding-top: 1rem;
+  padding-bottom: 0.75rem;
+  padding-top: 0.75rem;
   width: 90vw;
+}
+
+.filterButton {
+  flex: 1;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--gray-600);
+  border-radius: 20px;
+  background-color: transparent;
+  color: var(--gray-600);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.filterButton:hover {
+  background-color: var(--gray-100);
+}
+
+.filterButtonActive {
+  background-color: var(--blue-400);
+  border-color: var(--blue-400);
+  color: var(--white);
+}
+
+.filterButtonActive:hover {
+  background-color: var(--blue-400);
+  opacity: 0.9;
 }
 
 .containerCard {
@@ -83,12 +113,62 @@
   background-color: var(--blue-400);
 }
 
+.arrivedButton {
+  background-color: var(--green-400);
+}
+
 .pickUpButton {
   background-color: var(--green-400);
 }
 
 .dropOffButton:disabled,
 .pickUpButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Arrival alert buttons ── */
+.arrivalButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.alertRow {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.alertButton {
+  flex: 1;
+  padding: 0.4rem 0.25rem;
+  border: 1.5px solid var(--gray-600);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--gray-600);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.alertButton:hover:not(:disabled) {
+  background-color: var(--gray-100);
+}
+
+.alertButtonActive {
+  background-color: var(--blue-200);
+  border-color: var(--blue-400);
+  color: var(--blue-400);
+}
+
+.alertButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

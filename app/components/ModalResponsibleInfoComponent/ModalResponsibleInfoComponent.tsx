@@ -7,7 +7,10 @@ import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import ModalRegisterChildComponent from '../ModalRegisterChild/ModalRegisterChildComponent';
 import { getChildrenListByResponsibleId } from '@/app/actions/getChildrenListByResposnibleId';
 import { getChildById } from '@/app/actions/getChildById';
+import { unlinkResponsibleFromChild } from '@/app/actions/unlinkResponsibleFromChild';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { Snackbar, Alert } from '@mui/material';
 
 type ResponsibleInfo = {
   id: string;
@@ -36,6 +39,12 @@ export default function ModalResponsibleInfoComponent({
   const [selectedChild, setSelectedChild] = useState<any>(null);
   const [showChildInfo, setShowChildInfo] = useState(false);
   const [loadingChild, setLoadingChild] = useState(false);
+  const [unlinkingChildId, setUnlinkingChildId] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
   const modalRef = useRef(null);
 
   const handleCloseModal = () => {
@@ -88,6 +97,28 @@ export default function ModalResponsibleInfoComponent({
     setShowChildInfo(false);
     setSelectedChild(null);
     setShowResponsibleModalContent(true);
+  };
+
+  const handleUnlinkChild = async (e: React.MouseEvent, childId: string) => {
+    e.stopPropagation();
+    if (!responsibleInfo) return;
+    setUnlinkingChildId(childId);
+    try {
+      const result = await unlinkResponsibleFromChild(childId, responsibleInfo.id);
+      if (result?.status === 204 || !result?.statusCode) {
+        setChildrenList((prev) => prev.filter((c) => c.id !== childId));
+        setSnackbar({ open: true, message: 'Vínculo removido com sucesso.', severity: 'success' });
+      } else {
+        setSnackbar({
+          open: true,
+          message: result?.message || 'Não é possível remover o último responsável.',
+          severity: 'error',
+        });
+      }
+    } catch {
+      setSnackbar({ open: true, message: 'Erro ao remover vínculo.', severity: 'error' });
+    }
+    setUnlinkingChildId(null);
   };
 
   useEffect(() => {
@@ -189,6 +220,14 @@ export default function ModalResponsibleInfoComponent({
                             </p>
                           )}
                         </div>
+                        <button
+                          className={style.unlinkButton}
+                          title="Desvincular criança"
+                          disabled={unlinkingChildId === child.id}
+                          onClick={(e) => handleUnlinkChild(e, child.id)}
+                        >
+                          <LinkOffIcon fontSize="small" />
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -267,6 +306,20 @@ export default function ModalResponsibleInfoComponent({
           )}
         </div>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
