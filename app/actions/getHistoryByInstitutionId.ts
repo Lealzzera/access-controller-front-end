@@ -16,12 +16,15 @@ export async function getHistoryByInstitutionId({
   try {
     let path = `/history/institution/${institutionId}`;
     const params = new URLSearchParams();
-    if (dateFrom) params.set('dateFrom', dateFrom);
-    if (dateTo) params.set('dateTo', dateTo);
+    if (dateFrom) params.set('dateFrom', dateFrom.split('').reverse().join(''));
+    if (dateTo) params.set('dateTo', dateTo.split('').reverse().join(''));
     if (params.toString()) path += `?${params.toString()}`;
+
+    console.log({dateFrom, dateTo})
 
     const response = await apiClient({ path, method: 'GET' });
     const data = await response.json();
+    console.log(data)
     return data;
   } catch (error: unknown) {
     console.error('Erro ao buscar histórico:', error);

@@ -54,6 +54,7 @@ export default function HistoryPage() {
         dateFrom,
         dateTo,
       });
+      console.log(data)
       if (Array.isArray(data?.history)) {
         setHistory(data.history);
       } else {
@@ -66,7 +67,6 @@ export default function HistoryPage() {
     setLoading(false);
   }, [userInfo, dateFrom, dateTo]);
 
-  // busca automática ao montar (hoje por padrão)
   useEffect(() => {
     if (userInfo && !fetched) fetchHistory();
   }, [userInfo, fetched, fetchHistory]);
