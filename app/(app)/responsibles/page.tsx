@@ -60,6 +60,12 @@ export default function Responsibles() {
     fetchResponsibles('', true);
   }, [fetchResponsibles]);
 
+  useEffect(() => {
+    if (!isRegisterModalOPen) {
+      fetchResponsibles('', true);
+    }
+  }, [isRegisterModalOPen])
+
   const lastItemRef = useCallback(
     (node: HTMLLIElement | null) => {
       if (loading || loadingMore) return;

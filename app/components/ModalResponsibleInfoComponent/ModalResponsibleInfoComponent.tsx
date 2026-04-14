@@ -73,7 +73,6 @@ export default function ModalResponsibleInfoComponent({
     if (!responsibleInfo) return;
     setLoadingChildrenList(true);
     const response = await getChildrenListByResponsibleId(responsibleInfo.id);
-    console.log(response);
     if (Array.isArray(response)) {
       setChildrenList(response);
     } else {
@@ -99,31 +98,37 @@ export default function ModalResponsibleInfoComponent({
     setShowResponsibleModalContent(true);
   };
 
-  const handleUnlinkChild = async (e: React.MouseEvent, childId: string) => {
-    e.stopPropagation();
-    if (!responsibleInfo) return;
-    setUnlinkingChildId(childId);
-    try {
-      const result = await unlinkResponsibleFromChild(childId, responsibleInfo.id);
-      if (result?.status === 204 || !result?.statusCode) {
-        setChildrenList((prev) => prev.filter((c) => c.id !== childId));
-        setSnackbar({ open: true, message: 'Vínculo removido com sucesso.', severity: 'success' });
-      } else {
-        setSnackbar({
-          open: true,
-          message: result?.message || 'Não é possível remover o último responsável.',
-          severity: 'error',
-        });
-      }
-    } catch {
-      setSnackbar({ open: true, message: 'Erro ao remover vínculo.', severity: 'error' });
-    }
-    setUnlinkingChildId(null);
-  };
+  // const handleUnlinkChild = async (e: React.MouseEvent, childId: string) => {
+  //   e.stopPropagation();
+  //   if (!responsibleInfo) return;
+  //   setUnlinkingChildId(childId);
+  //   try {
+  //     const result = await unlinkResponsibleFromChild(childId, responsibleInfo.id);
+  //     if (result?.status === 204 || !result?.statusCode) {
+  //       setChildrenList((prev) => prev.filter((c) => c.id !== childId));
+  //       setSnackbar({ open: true, message: 'Vínculo removido com sucesso.', severity: 'success' });
+  //     } else {
+  //       setSnackbar({
+  //         open: true,
+  //         message: result?.message || 'Não é possível remover o último responsável.',
+  //         severity: 'error',
+  //       });
+  //     }
+  //   } catch {
+  //     setSnackbar({ open: true, message: 'Erro ao remover vínculo.', severity: 'error' });
+  //   }
+  //   setUnlinkingChildId(null);
+  // };
 
   useEffect(() => {
     getChildrenList();
   }, [responsibleInfo]);
+
+  useEffect(() => {
+    if (!openModalRegisterChild) {
+      getChildrenList();
+    }
+  }, [openModalRegisterChild]);
 
   return (
     <>
@@ -220,14 +225,14 @@ export default function ModalResponsibleInfoComponent({
                             </p>
                           )}
                         </div>
-                        <button
+                        {/* <button
                           className={style.unlinkButton}
                           title="Desvincular criança"
                           disabled={unlinkingChildId === child.id}
                           onClick={(e) => handleUnlinkChild(e, child.id)}
                         >
                           <LinkOffIcon fontSize="small" />
-                        </button>
+                        </button> */}
                       </li>
                     ))}
                   </ul>
