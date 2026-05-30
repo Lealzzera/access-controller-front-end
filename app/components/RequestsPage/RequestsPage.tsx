@@ -47,8 +47,13 @@ export default function RequestsPage() {
   const [loading, setLoading] = useState(true);
   const [processingIds, setProcessingIds] = useState<string[]>([]);
 
-  const { onNewSolicitation, onArrivalAlert, onSolicitationAccepted, onSolicitationRejected } =
-    useSocket();
+  const {
+    onNewSolicitation,
+    onArrivalAlert,
+    onArrivalAlertRemoved,
+    onSolicitationAccepted,
+    onSolicitationRejected,
+  } = useSocket();
 
   const alertTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
@@ -136,13 +141,38 @@ export default function RequestsPage() {
       setCards((prev) => prev.filter((c) => c.id !== data.id));
     });
 
+    const unsubAlertRemoved = onArrivalAlertRemoved(({ childId, responsibleId }) => {
+      setCards((prev) =>
+        prev.filter((c) => {
+          if (c.kind !== 'alert') return true;
+          const matches =
+            c.data.childId === childId && c.data.responsibleId === responsibleId;
+          if (matches) {
+            const timer = alertTimers.current.get(c.id);
+            if (timer) {
+              clearTimeout(timer);
+              alertTimers.current.delete(c.id);
+            }
+          }
+          return !matches;
+        })
+      );
+    });
+
     return () => {
       unsubNew();
       unsubAlert();
       unsubAccepted();
       unsubRejected();
+      unsubAlertRemoved();
     };
-  }, [onNewSolicitation, onArrivalAlert, onSolicitationAccepted, onSolicitationRejected]);
+  }, [
+    onNewSolicitation,
+    onArrivalAlert,
+    onArrivalAlertRemoved,
+    onSolicitationAccepted,
+    onSolicitationRejected,
+  ]);
 
   // ── Ações ────────────────────────────────────────────────────────────────
 

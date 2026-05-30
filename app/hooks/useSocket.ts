@@ -95,11 +95,21 @@ export function useSocket() {
     };
   };
 
+  const onArrivalAlertRemoved = (
+    callback: (data: { childId: string; responsibleId: string }) => void,
+  ) => {
+    socketRef.current?.on('arrival-alert-removed', callback);
+    return () => {
+      socketRef.current?.off('arrival-alert-removed', callback);
+    };
+  };
+
   return {
     connected,
     onNewSolicitation,
     onSolicitationAccepted,
     onSolicitationRejected,
     onArrivalAlert,
+    onArrivalAlertRemoved,
   };
 }

@@ -40,39 +40,99 @@ export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>('all');
 
   const [solicitingIds, setSolicitingIds] = useState<string[]>([]);
-  const [cooldownIds, setCooldownIds] = useState<string[]>([]);
+  // Per-child cooldown end timestamps (ms epoch). Persisted in localStorage
+  // so the disabled state survives reloads / navigation.
+  const [solicitationCooldowns, setSolicitationCooldowns] = useState<Record<string, number>>({});
+  const [alertCooldowns, setAlertCooldowns] = useState<Record<string, number>>({});
+  // Ticks every second to force re-render of countdown labels.
+  const [nowTick, setNowTick] = useState(() => Date.now());
 
   const [arrivalStates, setArrivalStates] = useState<Record<string, ArrivalState>>({});
   const [alertingIds, setAlertingIds] = useState<string[]>([]);
 
   const { onSolicitationAccepted, onSolicitationRejected } = useSocket();
-  const cooldownTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const observer = useRef<IntersectionObserver | null>(null);
+
+  const COOLDOWN_MS = 5 * 60 * 1000;
+  const SOLICITATION_COOLDOWN_KEY = 'solicitation-cooldowns';
+  const ALERT_COOLDOWN_KEY = 'alert-cooldowns';
+
+  const pruneExpired = (map: Record<string, number>): Record<string, number> => {
+    const now = Date.now();
+    const next: Record<string, number> = {};
+    for (const [id, until] of Object.entries(map)) {
+      if (until > now) next[id] = until;
+    }
+    return next;
+  };
+
+  // Load persisted cooldowns on mount.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(SOLICITATION_COOLDOWN_KEY);
+      if (raw) setSolicitationCooldowns(pruneExpired(JSON.parse(raw)));
+    } catch {
+      /* ignore */
+    }
+    try {
+      const raw = window.localStorage.getItem(ALERT_COOLDOWN_KEY);
+      if (raw) setAlertCooldowns(pruneExpired(JSON.parse(raw)));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Persist whenever cooldowns change.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(
+      SOLICITATION_COOLDOWN_KEY,
+      JSON.stringify(solicitationCooldowns)
+    );
+  }, [solicitationCooldowns]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(ALERT_COOLDOWN_KEY, JSON.stringify(alertCooldowns));
+  }, [alertCooldowns]);
+
+  // 1-second ticker to drive the countdown labels and auto-clear expired entries.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setNowTick(now);
+      setSolicitationCooldowns((prev) => {
+        const pruned = pruneExpired(prev);
+        return Object.keys(pruned).length === Object.keys(prev).length ? prev : pruned;
+      });
+      setAlertCooldowns((prev) => {
+        const pruned = pruneExpired(prev);
+        return Object.keys(pruned).length === Object.keys(prev).length ? prev : pruned;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleOpenCard = (cardInfo: ChildrenDataType) => {
     setOpenModalChildInfo(true);
     setChildInfo(cardInfo);
   };
 
-  const startCooldown = (childId: string) => {
-    setCooldownIds((prev) => [...prev, childId]);
-    const timer = setTimeout(
-      () => {
-        setCooldownIds((prev) => prev.filter((id) => id !== childId));
-        cooldownTimers.current.delete(childId);
-      },
-      5 * 60 * 1000
-    );
-    cooldownTimers.current.set(childId, timer);
+  const formatRemaining = (until: number): string => {
+    const diff = Math.max(0, until - nowTick);
+    const totalSec = Math.ceil(diff / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  useEffect(() => {
-    return () => {
-      cooldownTimers.current.forEach((timer) => clearTimeout(timer));
-    };
-  }, []);
-
   const handleArrivalAlert = async (childId: string, minutes: 'MINUTES_30' | 'MINUTES_15') => {
+    const until = alertCooldowns[childId];
+    if (until && until > Date.now()) {
+      toast.warn(`Aguarde ${formatRemaining(until)} para enviar outro aviso.`);
+      return;
+    }
     setAlertingIds((prev) => [...prev, childId]);
     try {
       const result = await sendArrivalAlert({ minutes, childId });
@@ -80,6 +140,7 @@ export default function HomePage() {
         toast.error('Erro ao enviar aviso.');
       } else {
         setArrivalStates((prev) => ({ ...prev, [childId]: minutes }));
+        setAlertCooldowns((prev) => ({ ...prev, [childId]: Date.now() + COOLDOWN_MS }));
         const label = minutes === 'MINUTES_30' ? '30 minutos' : '15 minutos';
         toast.info(`Aviso enviado: chego em ${label}.`);
       }
@@ -90,8 +151,9 @@ export default function HomePage() {
   };
 
   const handleSolicitation = async (childId: string, type: 'DROP_OFF' | 'PICK_UP') => {
-    if (cooldownIds.includes(childId)) {
-      toast.warn('Aguarde 5 minutos para enviar outra solicitação para esta criança.');
+    const until = solicitationCooldowns[childId];
+    if (until && until > Date.now()) {
+      toast.warn(`Aguarde ${formatRemaining(until)} para enviar outra solicitação.`);
       return;
     }
     setSolicitingIds((prev) => [...prev, childId]);
@@ -101,7 +163,7 @@ export default function HomePage() {
         toast.error('Erro ao enviar solicitação.');
       } else {
         toast.success('Solicitação enviada! Aguarde a resposta da escola.');
-        startCooldown(childId);
+        setSolicitationCooldowns((prev) => ({ ...prev, [childId]: Date.now() + COOLDOWN_MS }));
         setArrivalStates((prev) => ({ ...prev, [childId]: 'none' }));
       }
     } catch {
@@ -278,10 +340,21 @@ export default function HomePage() {
           childrenData.map((child, index) => {
             const isLastCard = index === childrenData.length - 1;
             const isSoliciting = solicitingIds.includes(child.id);
-            const isOnCooldown = cooldownIds.includes(child.id);
+            const solicitationCooldownUntil = solicitationCooldowns[child.id];
+            const isOnSolicitationCooldown =
+              !!solicitationCooldownUntil && solicitationCooldownUntil > nowTick;
+            const alertCooldownUntil = alertCooldowns[child.id];
+            const isOnAlertCooldown =
+              !!alertCooldownUntil && alertCooldownUntil > nowTick;
             const isAlerting = alertingIds.includes(child.id);
             const arrivalState = arrivalStates[child.id] ?? 'none';
             const hasPreArrival = arrivalState !== 'none';
+            const alertCountdown = isOnAlertCooldown
+              ? formatRemaining(alertCooldownUntil)
+              : null;
+            const solicitationCountdown = isOnSolicitationCooldown
+              ? formatRemaining(solicitationCooldownUntil)
+              : null;
 
             return (
               <div
@@ -300,33 +373,47 @@ export default function HomePage() {
 
                 {userInfo?.role === Role.RESPONSIBLE && (
                   <div className={style.arrivalButtons}>
-                    <div className={style.alertRow}>
-                      <button
-                        className={`${style.alertButton} ${arrivalState === 'MINUTES_30' ? style.alertButtonActive : ''}`}
-                        disabled={isAlerting || arrivalState === 'MINUTES_30'}
-                        onClick={() => handleArrivalAlert(child.id, 'MINUTES_30')}
-                      >
-                        Chego em 30 min
-                      </button>
-                      <button
-                        className={`${style.alertButton} ${arrivalState === 'MINUTES_15' ? style.alertButtonActive : ''}`}
-                        disabled={isAlerting || arrivalState === 'MINUTES_15'}
-                        onClick={() => handleArrivalAlert(child.id, 'MINUTES_15')}
-                      >
-                        Chego em 15 min
-                      </button>
-                    </div>
+                    {child.isPresent && (
+                      <div className={style.alertRow}>
+                        <button
+                          className={`${style.alertButton} ${arrivalState === 'MINUTES_30' ? style.alertButtonActive : ''}`}
+                          disabled={
+                            isAlerting ||
+                            isOnAlertCooldown ||
+                            arrivalState === 'MINUTES_30'
+                          }
+                          onClick={() => handleArrivalAlert(child.id, 'MINUTES_30')}
+                        >
+                          {isOnAlertCooldown
+                            ? `Aguarde ${alertCountdown}`
+                            : 'Chego em 30 min'}
+                        </button>
+                        <button
+                          className={`${style.alertButton} ${arrivalState === 'MINUTES_15' ? style.alertButtonActive : ''}`}
+                          disabled={
+                            isAlerting ||
+                            isOnAlertCooldown ||
+                            arrivalState === 'MINUTES_15'
+                          }
+                          onClick={() => handleArrivalAlert(child.id, 'MINUTES_15')}
+                        >
+                          {isOnAlertCooldown
+                            ? `Aguarde ${alertCountdown}`
+                            : 'Chego em 15 min'}
+                        </button>
+                      </div>
+                    )}
 
                     {!child.isPresent ? (
                       <button
                         className={`${style.dropOffButton} ${hasPreArrival ? style.arrivedButton : ''}`}
-                        disabled={isSoliciting || isOnCooldown}
+                        disabled={isSoliciting || isOnSolicitationCooldown}
                         onClick={() => handleSolicitation(child.id, 'DROP_OFF')}
                       >
                         {isSoliciting
                           ? 'Enviando...'
-                          : isOnCooldown
-                            ? 'Aguarde...'
+                          : isOnSolicitationCooldown
+                            ? `Aguarde ${solicitationCountdown}`
                             : hasPreArrival
                               ? 'Cheguei'
                               : 'Solicitar entrada'}
@@ -334,13 +421,13 @@ export default function HomePage() {
                     ) : (
                       <button
                         className={`${style.pickUpButton} ${hasPreArrival ? style.arrivedButton : ''}`}
-                        disabled={isSoliciting || isOnCooldown}
+                        disabled={isSoliciting || isOnSolicitationCooldown}
                         onClick={() => handleSolicitation(child.id, 'PICK_UP')}
                       >
                         {isSoliciting
                           ? 'Enviando...'
-                          : isOnCooldown
-                            ? 'Aguarde...'
+                          : isOnSolicitationCooldown
+                            ? `Aguarde ${solicitationCountdown}`
                             : hasPreArrival
                               ? 'Cheguei'
                               : 'Buscar criança'}
@@ -349,21 +436,6 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {userInfo?.role === Role.RESPONSIBLE && child.isPresent && (
-                  <div className={style.solicitationButtons}>
-                    <button
-                      className={style.pickUpButton}
-                      disabled={isSoliciting || isOnCooldown}
-                      onClick={() => handleSolicitation(child.id, 'PICK_UP')}
-                    >
-                      {isSoliciting
-                        ? 'Enviando...'
-                        : isOnCooldown
-                          ? 'Aguarde...'
-                          : 'Buscar criança'}
-                    </button>
-                  </div>
-                )}
               </div>
             );
           })}
