@@ -1,19 +1,18 @@
 'use client';
 
-import CardInfoComponent from '@/app/components/CardInfoComponent/CardInfoComponent';
-import style from './style.module.css';
-import { useUser } from '@/app/context/userContext';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { getChildrenPaginated } from '@/app/actions/getChildrenPaginated';
-import { getChildrenListByResponsibleId } from '@/app/actions/getChildrenListByResposnibleId';
 import { createSolicitation } from '@/app/actions/createSolicitation';
+import { getChildrenListByResponsibleId } from '@/app/actions/getChildrenListByResposnibleId';
+import { getChildrenPaginated } from '@/app/actions/getChildrenPaginated';
 import { sendArrivalAlert } from '@/app/actions/sendArrivalAlert';
-import { CircularProgress } from '@mui/material';
-import { Skeleton } from '@mui/material';
-import ModalChildInfoComponent from '../ModalChildInfoComponent/ModalChildInfoComponent';
+import CardInfoComponent from '@/app/components/CardInfoComponent/CardInfoComponent';
+import { useUser } from '@/app/context/userContext';
 import { Role } from '@/app/enums/Role.enum';
 import { useSocket } from '@/app/hooks/useSocket';
+import { CircularProgress, Skeleton } from '@mui/material';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import ModalChildInfoComponent from '../ModalChildInfoComponent/ModalChildInfoComponent';
+import style from './style.module.css';
 
 type ChildrenDataType = {
   id: string;
@@ -27,7 +26,6 @@ type ChildrenDataType = {
 
 type ActiveFilter = 'all' | 'present' | 'absent';
 
-// Estado de aviso de chegada por criança
 type ArrivalState = 'none' | 'MINUTES_30' | 'MINUTES_15';
 
 export default function HomePage() {
@@ -41,13 +39,10 @@ export default function HomePage() {
   const [childInfo, setChildInfo] = useState<any>(undefined);
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>('all');
 
-  // Estados de solicitação real
   const [solicitingIds, setSolicitingIds] = useState<string[]>([]);
   const [cooldownIds, setCooldownIds] = useState<string[]>([]);
 
-  // Estado dos avisos de chegada: childId → 'none' | 'MINUTES_30' | 'MINUTES_15'
   const [arrivalStates, setArrivalStates] = useState<Record<string, ArrivalState>>({});
-  // IDs onde o alerta está sendo enviado
   const [alertingIds, setAlertingIds] = useState<string[]>([]);
 
   const { onSolicitationAccepted, onSolicitationRejected } = useSocket();
@@ -77,7 +72,6 @@ export default function HomePage() {
     };
   }, []);
 
-  // ── Alerta de chegada (30 ou 15 min) ──────────────────────────────────────
   const handleArrivalAlert = async (childId: string, minutes: 'MINUTES_30' | 'MINUTES_15') => {
     setAlertingIds((prev) => [...prev, childId]);
     try {
@@ -95,7 +89,6 @@ export default function HomePage() {
     setAlertingIds((prev) => prev.filter((id) => id !== childId));
   };
 
-  // ── Solicitação real (PICK_UP) ────────────────────────────────────────────
   const handleSolicitation = async (childId: string, type: 'DROP_OFF' | 'PICK_UP') => {
     if (cooldownIds.includes(childId)) {
       toast.warn('Aguarde 5 minutos para enviar outra solicitação para esta criança.');
@@ -109,7 +102,6 @@ export default function HomePage() {
       } else {
         toast.success('Solicitação enviada! Aguarde a resposta da escola.');
         startCooldown(childId);
-        // limpa o estado de aviso de chegada após enviar a solicitação real
         setArrivalStates((prev) => ({ ...prev, [childId]: 'none' }));
       }
     } catch {
@@ -306,10 +298,8 @@ export default function HomePage() {
                   pictureUrl={child.picture}
                 />
 
-                {/* Botões só para RESPONSIBLE */}
                 {userInfo?.role === Role.RESPONSIBLE && (
                   <div className={style.arrivalButtons}>
-                    {/* Linha 1: avisos de chegada (disponível nos dois estados) */}
                     <div className={style.alertRow}>
                       <button
                         className={`${style.alertButton} ${arrivalState === 'MINUTES_30' ? style.alertButtonActive : ''}`}
@@ -327,7 +317,6 @@ export default function HomePage() {
                       </button>
                     </div>
 
-                    {/* Linha 2: botão condicional — entrada ou saída */}
                     {!child.isPresent ? (
                       <button
                         className={`${style.dropOffButton} ${hasPreArrival ? style.arrivedButton : ''}`}
@@ -360,7 +349,6 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {/* Botão buscar para RESPONSIBLE em crianças presentes */}
                 {userInfo?.role === Role.RESPONSIBLE && child.isPresent && (
                   <div className={style.solicitationButtons}>
                     <button

@@ -1,22 +1,20 @@
 'use client';
 
+import { loginUser } from '@/app/actions/loginUser';
+import { CircularProgress } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { SyntheticEvent, useState } from 'react';
+import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import InputFieldComponent from '../InputFieldComponent/InputFieldComponent';
 import {
   ButtonContainer,
-  CreateAccountLink,
   ErrorMessage,
-  ForgotPassowordText,
   InfoContainer,
   LoginPageContainer,
   LoginPageForm,
   LoginTitle,
   WrappedFields,
 } from './styles';
-import ButtonComponent from '../ButtonComponent/ButtonComponent';
-import { useRouter } from 'next/navigation';
-import { loginUser } from '@/app/actions/loginUser';
-import { CircularProgress } from '@mui/material';
 
 export default function LoginPage() {
   const [emailValue, setEmailValue] = useState('');
@@ -33,6 +31,7 @@ export default function LoginPage() {
         email: emailValue,
         password: passwordValue,
       });
+
       if (response.status !== 200) {
         setLoading(false);
         setErrorMessage('Usuário ou senha inválidos.');
