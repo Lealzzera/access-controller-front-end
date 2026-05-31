@@ -24,6 +24,7 @@ export default function LoginPage() {
   const route = useRouter();
 
   const handleLogin = async () => {
+    console.log('handleLogin');
     if (emailValue.length && passwordValue.length) {
       setLoading(true);
       setErrorMessage('');
@@ -31,6 +32,8 @@ export default function LoginPage() {
         email: emailValue,
         password: passwordValue,
       });
+
+      console.log('response login', response);
 
       if (response.status !== 200) {
         setLoading(false);
