@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { getToken } from '../actions/getToken';
 
@@ -33,6 +33,7 @@ export type ArrivalAlertData = {
 
 export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
+  const [socketInstance, setSocketInstance] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export function useSocket() {
 
       const socket = io(`${backendUrl}/solicitations`, {
         auth: { token },
+        transports: ['websocket', 'polling'],
       });
 
       socket.on('connect', () => {
@@ -54,7 +56,13 @@ export function useSocket() {
         setConnected(false);
       });
 
+      socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error.message);
+        setConnected(false);
+      });
+
       socketRef.current = socket;
+      setSocketInstance(socket);
     };
 
     connectSocket();
@@ -63,46 +71,45 @@ export function useSocket() {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setSocketInstance(null);
       }
     };
   }, []);
 
-  const onNewSolicitation = (callback: (data: SolicitationData) => void) => {
-    socketRef.current?.on('new-solicitation', callback);
+  const onNewSolicitation = useCallback((callback: (data: SolicitationData) => void) => {
+    socketInstance?.on('new-solicitation', callback);
     return () => {
-      socketRef.current?.off('new-solicitation', callback);
+      socketInstance?.off('new-solicitation', callback);
     };
-  };
+  }, [socketInstance]);
 
-  const onSolicitationAccepted = (callback: (data: SolicitationData) => void) => {
-    socketRef.current?.on('solicitation-accepted', callback);
+  const onSolicitationAccepted = useCallback((callback: (data: SolicitationData) => void) => {
+    socketInstance?.on('solicitation-accepted', callback);
     return () => {
-      socketRef.current?.off('solicitation-accepted', callback);
+      socketInstance?.off('solicitation-accepted', callback);
     };
-  };
+  }, [socketInstance]);
 
-  const onSolicitationRejected = (callback: (data: SolicitationData) => void) => {
-    socketRef.current?.on('solicitation-rejected', callback);
+  const onSolicitationRejected = useCallback((callback: (data: SolicitationData) => void) => {
+    socketInstance?.on('solicitation-rejected', callback);
     return () => {
-      socketRef.current?.off('solicitation-rejected', callback);
+      socketInstance?.off('solicitation-rejected', callback);
     };
-  };
+  }, [socketInstance]);
 
-  const onArrivalAlert = (callback: (data: ArrivalAlertData) => void) => {
-    socketRef.current?.on('arrival-alert', callback);
+  const onArrivalAlert = useCallback((callback: (data: ArrivalAlertData) => void) => {
+    socketInstance?.on('arrival-alert', callback);
     return () => {
-      socketRef.current?.off('arrival-alert', callback);
+      socketInstance?.off('arrival-alert', callback);
     };
-  };
+  }, [socketInstance]);
 
-  const onArrivalAlertRemoved = (
-    callback: (data: { childId: string; responsibleId: string }) => void,
-  ) => {
-    socketRef.current?.on('arrival-alert-removed', callback);
+  const onArrivalAlertRemoved = useCallback((callback: (data: { childId: string; responsibleId: string }) => void) => {
+    socketInstance?.on('arrival-alert-removed', callback);
     return () => {
-      socketRef.current?.off('arrival-alert-removed', callback);
+      socketInstance?.off('arrival-alert-removed', callback);
     };
-  };
+  }, [socketInstance]);
 
   return {
     connected,

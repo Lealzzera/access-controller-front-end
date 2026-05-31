@@ -22,25 +22,30 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    console.log('handleLogin');
-    if (emailValue.length && passwordValue.length) {
-      setLoading(true);
-      setErrorMessage('');
+    if (!emailValue.length || !passwordValue.length) {
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+
+    try {
       const response = await loginUser({
         email: emailValue,
         password: passwordValue,
       });
 
-      console.log('response login', response);
-
       if (response.status !== 200) {
-        setLoading(false);
-        setErrorMessage('Usuário ou senha inválidos.');
+        setErrorMessage('Usuario ou senha invalidos.');
         return;
       }
 
-      setLoading(false);
       window.location.assign('/home');
+    } catch (error) {
+      console.error('Erro ao realizar login:', error);
+      setErrorMessage('Erro interno no servidor. Tente novamente mais tarde.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,6 +53,7 @@ export default function LoginPage() {
     event.preventDefault();
     await handleLogin();
   };
+
   return (
     <LoginPageContainer>
       <LoginPageForm onSubmit={handleSubmit}>
@@ -78,7 +84,7 @@ export default function LoginPage() {
         </WrappedFields>
         <ButtonContainer>
           <ButtonComponent
-            disabled={!emailValue.length || !passwordValue.length}
+            disabled={!emailValue.length || !passwordValue.length || loading}
             type="submit"
             buttonText={
               !loading ? (
