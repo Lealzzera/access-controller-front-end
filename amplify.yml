@@ -1,0 +1,18 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - printf "BACKEND_URL=%s\n" "$BACKEND_URL" >> .env.production
+        - printf "NEXT_PUBLIC_BACKEND_URL=%s\n" "$NEXT_PUBLIC_BACKEND_URL" >> .env.production
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

@@ -10,8 +10,14 @@ type ApiClientType = {
 export async function apiClient({ path, method, headers, body }: ApiClientType) {
   const userTokenFromCookie = (await cookies()).get('access_token');
   const isFormData = body instanceof FormData;
+  const backendUrl = process.env.BACKEND_URL;
 
-  const response = await fetch(`${process.env.BACKEND_URL}${path}`, {
+  if (!backendUrl) {
+    throw new Error('BACKEND_URL environment variable is not configured.');
+  }
+
+  const url = `${backendUrl}${path}`;
+  const response = await fetch(url, {
     method,
     headers: {
       ...headers,
