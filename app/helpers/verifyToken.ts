@@ -7,7 +7,13 @@ export default async function verifyToken(accessToken?: string) {
     return false;
   }
   try {
-    await jwtVerify(accessToken, new TextEncoder().encode(process.env.JWT_ACCESS_TOKEN_SECRET));
+    const jwtSecret = process.env.JWT_SECRET ?? process.env.JWT_ACCESS_TOKEN_SECRET;
+
+    if (!jwtSecret) {
+      return false;
+    }
+
+    await jwtVerify(accessToken, new TextEncoder().encode(jwtSecret));
 
     return true;
   } catch (error) {
