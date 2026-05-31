@@ -1,21 +1,22 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import verifyToken from './app/helpers/verifyToken';
 
 export async function middleware(req: NextRequest) {
   const { cookies } = req;
 
   const accessToken = cookies.get('access_token')?.value;
 
-  const isTokenValid = await verifyToken(accessToken);
+  const isAuthenticated = Boolean(accessToken);
 
-  if (!isTokenValid && req.nextUrl.pathname !== '/') {
+  if (!isAuthenticated && req.nextUrl.pathname !== '/') {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
-  if (isTokenValid && req.nextUrl.pathname === '/') {
+  if (isAuthenticated && req.nextUrl.pathname === '/') {
     return NextResponse.redirect(new URL('/home', req.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

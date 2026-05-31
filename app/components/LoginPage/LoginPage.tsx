@@ -2,7 +2,6 @@
 
 import { loginUser } from '@/app/actions/loginUser';
 import { CircularProgress } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { SyntheticEvent, useState } from 'react';
 import ButtonComponent from '../ButtonComponent/ButtonComponent';
 import InputFieldComponent from '../InputFieldComponent/InputFieldComponent';
@@ -21,7 +20,6 @@ export default function LoginPage() {
   const [passwordValue, setPasswordValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const route = useRouter();
 
   const handleLogin = async () => {
     console.log('handleLogin');
@@ -42,7 +40,7 @@ export default function LoginPage() {
       }
 
       setLoading(false);
-      route.push('/home');
+      window.location.assign('/home');
     }
   };
 
