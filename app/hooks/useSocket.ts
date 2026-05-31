@@ -42,8 +42,9 @@ export function useSocket() {
       if (!token) return;
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3333';
+      const socketBaseUrl = backendUrl.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
 
-      const socket = io(`${backendUrl}/solicitations`, {
+      const socket = io(`${socketBaseUrl}/solicitations`, {
         auth: { token },
         transports: ['websocket', 'polling'],
       });
